@@ -1,8 +1,9 @@
 {
   "name": "ultimate-homebrew-extensions",
   "displayName": "ultimate-homebrew-extensions",
+  "publisher": "JoelLonganecker",
   "description": "",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -10,14 +11,12 @@
     "Other"
   ],
   "activationEvents": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/longjoel/ultimate-homebrew-extensions.git"},
   "main": "./dist/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "ultimate-homebrew-extensions.helloWorld",
-        "title": "Hello World"
-      }
-    ],
+   
     "customEditors": [
       {
         "viewType": "ultimate-homebrew-extensions.gba-emulator",
