@@ -26,6 +26,42 @@
             "filenamePattern": "*.gba"
           }
         ]
+      },
+      {
+        "viewType": "ultimate-homebrew-extensions.gb-emulator",
+        "displayName": "GBC",
+        "selector": [
+          {
+            "filenamePattern": "*.gbc"
+          }
+        ]
+      },
+      {
+        "viewType": "ultimate-homebrew-extensions.gb-emulator",
+        "displayName": "GB",
+        "selector": [
+          {
+            "filenamePattern": "*.gb"
+          }
+        ]
+      },
+      {
+        "viewType": "ultimate-homebrew-extensions.snes-emulator",
+        "displayName": "SNES",
+        "selector": [
+          {
+            "filenamePattern": "*.sfc"
+          }
+        ]
+      },
+      {
+        "viewType": "ultimate-homebrew-extensions.nes-emulator",
+        "displayName": "NES",
+        "selector": [
+          {
+            "filenamePattern": "*.nes"
+          }
+        ]
       }
     ]
   },

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { ROMDocument } from './ROMDocument';
 
-export class GBAEmulatorProvider implements vscode.CustomReadonlyEditorProvider {
+export class GameboyEmulatorProvider implements vscode.CustomReadonlyEditorProvider {
 
 	public constructor(private readonly context: vscode.ExtensionContext) {
 		this.context = context;
@@ -26,7 +26,7 @@ export class GBAEmulatorProvider implements vscode.CustomReadonlyEditorProvider 
   <body>
     <script>
 	(async function(){const nostalgist = await Nostalgist.launch({
-  core: 'mgba',
+  core: 'gambatte',
   rom: '${webviewPanel.webview.asWebviewUri(document.uri)}',
 	})})();
 	</script>
