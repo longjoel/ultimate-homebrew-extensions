@@ -23,7 +23,7 @@
         "displayName": "GBA",
         "selector": [
           {
-            "filenamePattern": "*.gb*"
+            "filenamePattern": "*.{gb,gba,gbc}"
           }
         ]
       },
