@@ -26,7 +26,7 @@ export class GameboyEmulatorProvider implements vscode.CustomReadonlyEditorProvi
   <body>
     <script>
 	(async function(){const nostalgist = await Nostalgist.launch({
-  core: 'gambatte',
+  core: 'mgba',
   rom: '${webviewPanel.webview.asWebviewUri(document.uri)}',
 	})})();
 	</script>

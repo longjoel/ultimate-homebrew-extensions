@@ -26,7 +26,7 @@ export class NESEmulatorProvider implements vscode.CustomReadonlyEditorProvider 
   <body>
     <script>
 	(async function(){const nostalgist = await Nostalgist.launch({
-  core: 'fceux',
+  core: 'fceumm',
   rom: '${webviewPanel.webview.asWebviewUri(document.uri)}',
 	})})();
 	</script>
