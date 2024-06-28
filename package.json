@@ -3,7 +3,7 @@
   "displayName": "ultimate-homebrew-extensions",
   "publisher": "JoelLonganecker",
   "description": "",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -23,25 +23,7 @@
         "displayName": "GBA",
         "selector": [
           {
-            "filenamePattern": "*.gba"
-          }
-        ]
-      },
-      {
-        "viewType": "ultimate-homebrew-extensions.gb-emulator",
-        "displayName": "GBC",
-        "selector": [
-          {
-            "filenamePattern": "*.gbc"
-          }
-        ]
-      },
-      {
-        "viewType": "ultimate-homebrew-extensions.gb-emulator",
-        "displayName": "GB",
-        "selector": [
-          {
-            "filenamePattern": "*.gb"
+            "filenamePattern": "*.gb*"
           }
         ]
       },
