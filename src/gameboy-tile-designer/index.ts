@@ -105,6 +105,11 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
             }
         });
 
+        const onDiskPath = vscode.Uri.joinPath(this.context.extensionUri, 'src', 'gameboy-tile-designer', 'assets', 'app.js');
+
+        // And get the special URI to use with the webview
+        const appJs = webviewPanel.webview.asWebviewUri(onDiskPath);
+
         webviewPanel.webview.html = `
         <!DOCTYPE html>
         <html lang="en">
@@ -112,22 +117,16 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Gameboy Tile Designer</title>
+             <script src="${appJs}"></script>
         </head>
         <body>
+        <div id="app"></div>
         <script>
-        const vscode = acquireVsCodeApi();
-        function onClickExportCFile() {
-            console.log('SEND${document.uri}');
-            const msg = {
-                command: 'exportCFile',
-                text: ${JSON.stringify(document)}
-            };
-          
-            vscode.postMessage(msg);
-        }
-        </script>
-        <button onclick='onClickExportCFile()'>${document.uri}</button>
-        </body>
+      vscode = acquireVsCodeApi();
+        window.app('${JSON.stringify(document)}', vscode);
+         </script>
+       </body>
+       
         `;
 
     }
