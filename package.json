@@ -16,14 +16,17 @@
     "url": "https://github.com/longjoel/ultimate-homebrew-extensions.git"},
   "main": "./dist/extension.js",
   "contributes": {
-   
+   "commands":[{
+      "command": "ultimate-homebrew-extensions.gb-tile-editor.exportCFile",
+      "title": "GB Tile Editor - Export C File"
+    }],
     "customEditors": [
       {
         "viewType": "ultimate-homebrew-extensions.gb-tile-editor",
         "displayName": "GB Tile Editor",
         "selector": [
           {
-            "filenamePattern": "*.{gbtd}"
+            "filenamePattern": "*.{gb,gba,gbc}"
           }
         ]
       },

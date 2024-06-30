@@ -25,6 +25,7 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
 
     constructor(private context: vscode.ExtensionContext) {
 
+      
         this.onDidChangeCustomDocument = new vscode.EventEmitter<vscode.CustomDocumentEditEvent<GameboyTileDesignerDocument>>().event;
     }
     openCustomDocument(uri: vscode.Uri, openContext: vscode.CustomDocumentOpenContext, token: vscode.CancellationToken): GameboyTileDesignerDocument | Thenable<GameboyTileDesignerDocument> {
@@ -45,7 +46,7 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
                 }
             }
         });
-        if(tileData.length === 0) {
+        if (tileData.length === 0) {
             tileData = [
                 {
                     tileIndex: 0,
@@ -54,8 +55,8 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
                 }
             ];
         }
-        
-        return new GameboyTileDesignerDocument(uri,tileData);
+
+        return new GameboyTileDesignerDocument(uri, tileData);
     }
 
     saveCustomDocument(document: GameboyTileDesignerDocument, cancellation: vscode.CancellationToken): Thenable<void> {
@@ -77,11 +78,40 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
     backupCustomDocument(document: GameboyTileDesignerDocument, context: vscode.CustomDocumentBackupContext, cancellation: vscode.CancellationToken): Thenable<vscode.CustomDocumentBackup> {
         return new Promise((resolve, reject) => { });
     }
+
+  
+
     resolveCustomEditor(document: GameboyTileDesignerDocument, webviewPanel: vscode.WebviewPanel, token: vscode.CancellationToken): void | Thenable<void> {
 
         webviewPanel.webview.options = { enableScripts: true };
 
-        webviewPanel.webview.html = `Hello World!`;
+        
+
+        webviewPanel.webview.html = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Gameboy Tile Designer</title>
+        </head>
+        <body>
+        <script>
+        const vscode = acquireVsCodeApi();
+        
+        function onClickExportCFile() {
+            console.log('SEND${document.uri}');
+            const msg = {
+                command: 'ultimate-homebrew-extensions.gb-tile-editor.exportCFile',
+                text: '${JSON.stringify(document)}'
+            };
+            console.log(JSON.stringify(msg));
+            vscode.postMessage(msg);
+        }
+        </script>
+        <button onclick='onClickExportCFile()'>${document.uri}</button>
+        </body>
+        `;
 
     }
 
