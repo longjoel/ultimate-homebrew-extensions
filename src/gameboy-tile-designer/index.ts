@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import * as react from 'react';
+import { createRoot } from 'react-dom/client';
 
 export interface TileData {
     tileIndex: number;
@@ -20,12 +22,24 @@ export class GameboyTileDesignerDocument implements vscode.CustomDocument {
 
 }
 
+function ExportCFile(document: GameboyTileDesignerDocument): void {
+
+    const cFile = document.tileData.map((tile) => {
+        return `const unsigned char ${tile.tileAlias}[16] = {${tile.data.join(',')}};`;
+    }).join('\n');
+    vscode.window.showSaveDialog({ filters: { 'C Files': ['c'] } }).then((uri) => {
+        if (uri) {
+            vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(cFile));
+        }
+    });
+}
+
 export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<GameboyTileDesignerDocument> {
     onDidChangeCustomDocument: vscode.Event<vscode.CustomDocumentEditEvent<GameboyTileDesignerDocument>> | vscode.Event<vscode.CustomDocumentContentChangeEvent<GameboyTileDesignerDocument>>;
 
     constructor(private context: vscode.ExtensionContext) {
 
-      
+
         this.onDidChangeCustomDocument = new vscode.EventEmitter<vscode.CustomDocumentEditEvent<GameboyTileDesignerDocument>>().event;
     }
     openCustomDocument(uri: vscode.Uri, openContext: vscode.CustomDocumentOpenContext, token: vscode.CancellationToken): GameboyTileDesignerDocument | Thenable<GameboyTileDesignerDocument> {
@@ -79,13 +93,17 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
         return new Promise((resolve, reject) => { });
     }
 
-  
+
 
     resolveCustomEditor(document: GameboyTileDesignerDocument, webviewPanel: vscode.WebviewPanel, token: vscode.CancellationToken): void | Thenable<void> {
 
         webviewPanel.webview.options = { enableScripts: true };
 
-        
+        webviewPanel.webview.onDidReceiveMessage((msg) => {
+            if (msg.command === 'exportCFile') {
+                ExportCFile(msg.text);
+            }
+        });
 
         webviewPanel.webview.html = `
         <!DOCTYPE html>
@@ -98,14 +116,13 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
         <body>
         <script>
         const vscode = acquireVsCodeApi();
-        
         function onClickExportCFile() {
             console.log('SEND${document.uri}');
             const msg = {
-                command: 'ultimate-homebrew-extensions.gb-tile-editor.exportCFile',
-                text: '${JSON.stringify(document)}'
+                command: 'exportCFile',
+                text: ${JSON.stringify(document)}
             };
-            console.log(JSON.stringify(msg));
+          
             vscode.postMessage(msg);
         }
         </script>

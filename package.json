@@ -13,13 +13,16 @@
   "activationEvents": [],
   "repository": {
     "type": "git",
-    "url": "https://github.com/longjoel/ultimate-homebrew-extensions.git"},
+    "url": "https://github.com/longjoel/ultimate-homebrew-extensions.git"
+  },
   "main": "./dist/extension.js",
   "contributes": {
-   "commands":[{
-      "command": "ultimate-homebrew-extensions.gb-tile-editor.exportCFile",
-      "title": "GB Tile Editor - Export C File"
-    }],
+    "commands": [
+      {
+        "command": "ultimate-homebrew-extensions.gb-tile-editor.exportCFile",
+        "title": "GB Tile Editor - Export C File"
+      }
+    ],
     "customEditors": [
       {
         "viewType": "ultimate-homebrew-extensions.gb-tile-editor",
@@ -73,12 +76,16 @@
   "devDependencies": {
     "@types/mocha": "^10.0.6",
     "@types/node": "20.x",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
     "@types/vscode": "^1.90.0",
     "@typescript-eslint/eslint-plugin": "^7.11.0",
     "@typescript-eslint/parser": "^7.11.0",
     "@vscode/test-cli": "^0.0.9",
     "@vscode/test-electron": "^2.4.0",
     "eslint": "^8.57.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "ts-loader": "^9.5.1",
     "typescript": "^5.4.5",
     "webpack": "^5.92.0",

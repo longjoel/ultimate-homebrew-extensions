@@ -12,16 +12,7 @@ import { GameBoyTileDesignerProvider, GameboyTileDesignerDocument } from './game
 
 export function activate(context: vscode.ExtensionContext) {
 
-	function ExportCFile(document: GameboyTileDesignerDocument): void {
-		const cFile = document.tileData.map((tile) => {
-			return `const unsigned char ${tile.tileAlias}[16] = {${tile.data.join(',')}};`;
-		}).join('\n');
-		vscode.window.showSaveDialog({ filters: { 'C Files': ['c'] } }).then((uri) => {
-			if (uri) {
-				vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(cFile));
-			}
-		});
-	}
+	
 	
 	
 	const gbaEmulator = vscode.window.registerCustomEditorProvider('ultimate-homebrew-extensions.gba-emulator', new GBAEmulatorProvider(context));
@@ -35,8 +26,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const gameboyTileDesigner = vscode.window.registerCustomEditorProvider('ultimate-homebrew-extensions.gb-tile-editor', new GameBoyTileDesignerProvider(context));
 	context.subscriptions.push(gameboyTileDesigner);
-
-	context.subscriptions.push(vscode.commands.registerCommand('ultimate-homebrew-extensions.gb-tile-editor.exportCFile', ExportCFile));
 }
 
 // This method is called when your extension is deactivated
