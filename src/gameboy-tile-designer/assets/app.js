@@ -2,7 +2,7 @@
 // This script will be run within the webview itself
 (async () => {
 
-    function onClickExportCFile(doc, vscode) {
+    function onClickExportCFile(doc, code) {
         debugger;
         console.log('SEND${document.uri}');
         const msg = {
@@ -10,7 +10,7 @@
             text: JSON.stringify(doc)
         };
       
-        vscode.postMessage(msg);
+        code.postMessage(msg);
     }
 
     window.app = (doc,code) => {
@@ -19,7 +19,7 @@
         console.log('made it');
         const btn = document.createElement('button');
         btn.textContent = 'Click me';
-        btn.addEventListener('click', () => onClickExportCFile(appDocument, vscode));
+        btn.addEventListener('click', () => onClickExportCFile(appDocument, code));
         
         var root = document.getElementById('app');
         

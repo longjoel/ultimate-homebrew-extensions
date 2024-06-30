@@ -27,10 +27,11 @@ function ExportCFile(document: GameboyTileDesignerDocument): void {
     const cFile = document.tileData.map((tile) => {
         return `const unsigned char ${tile.tileAlias}[16] = {${tile.data.join(',')}};`;
     }).join('\n');
-    vscode.window.showSaveDialog({ filters: { 'C Files': ['c'] } }).then((uri) => {
-        if (uri) {
-            vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(cFile));
-        }
+    vscode.window.showSaveDialog({ filters: { 'C Files': ['c'] } })
+        .then((uri) => {
+            if (uri) {
+                vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(cFile));
+            }
     });
 }
 
@@ -101,7 +102,7 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
 
         webviewPanel.webview.onDidReceiveMessage((msg) => {
             if (msg.command === 'exportCFile') {
-                ExportCFile(msg.text);
+                ExportCFile(JSON.parse(msg.text) as GameboyTileDesignerDocument);
             }
         });
 
