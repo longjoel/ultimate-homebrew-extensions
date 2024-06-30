@@ -4,6 +4,8 @@ import * as vscode from 'vscode';
 import { GBAEmulatorProvider } from './GBAEmulatorProvider';
 import { NESEmulatorProvider } from './NESEmulatorProvider';
 import { SNESEmulatorProvider } from './SNESEmulatorProvider';
+
+import { GameBoyTileDesignerProvider } from './gameboy-tile-designer';
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -16,6 +18,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const snesEmulator = vscode.window.registerCustomEditorProvider('ultimate-homebrew-extensions.snes-emulator', new SNESEmulatorProvider(context));
 	context.subscriptions.push(snesEmulator);
+
+	const gameboyTileDesigner = vscode.window.registerCustomEditorProvider('ultimate-homebrew-extensions.gb-tile-editor', new GameBoyTileDesignerProvider(context));
 }
 
 // This method is called when your extension is deactivated

@@ -19,6 +19,15 @@
    
     "customEditors": [
       {
+        "viewType": "ultimate-homebrew-extensions.gb-tile-editor",
+        "displayName": "GB Tile Editor",
+        "selector": [
+          {
+            "filenamePattern": "*.{gbtd}"
+          }
+        ]
+      },
+      {
         "viewType": "ultimate-homebrew-extensions.gba-emulator",
         "displayName": "GBA",
         "selector": [
