@@ -29,7 +29,7 @@
         "displayName": "GB Tile Editor",
         "selector": [
           {
-            "filenamePattern": "*.{gb,gba,gbc}"
+            "filenamePattern": "*.{gbtd}"
           }
         ]
       },
