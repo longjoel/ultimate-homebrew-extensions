@@ -141,7 +141,8 @@ function App() {
   const [scale, setScale] = useState(16);
   return (
     <div className="App">
-      <button onClick={() => setSize({ ...size, w: size.w + 1 })}>Wider</button>
+      <button onClick={() => setSize({ ...size, w: size.w + 1 })}>
+        Wider</button>
       <button onClick={() => setSize({ ...size, h: size.h + 1 })}>
         Taller
       </button>
