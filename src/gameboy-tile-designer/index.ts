@@ -1,6 +1,4 @@
 import * as vscode from 'vscode';
-import * as react from 'react';
-import { createRoot } from 'react-dom/client';
 
 export interface TileData {
     tileIndex: number;
@@ -32,7 +30,7 @@ function ExportCFile(document: GameboyTileDesignerDocument): void {
             if (uri) {
                 vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(cFile));
             }
-    });
+        });
 }
 
 export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<GameboyTileDesignerDocument> {
@@ -98,7 +96,7 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
 
     resolveCustomEditor(document: GameboyTileDesignerDocument, webviewPanel: vscode.WebviewPanel, token: vscode.CancellationToken): void | Thenable<void> {
 
-        webviewPanel.webview.options = { enableScripts: true };
+        webviewPanel.webview.options = { enableScripts: true , localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'packages', 'ultimate-gb-tile-editor','public')]};
 
         webviewPanel.webview.onDidReceiveMessage((msg) => {
             if (msg.command === 'exportCFile') {
@@ -106,29 +104,14 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
             }
         });
 
-        const onDiskPath = vscode.Uri.joinPath(this.context.extensionUri, 'src', 'gameboy-tile-designer', 'assets', 'app.js');
 
-        // And get the special URI to use with the webview
-        const appJs = webviewPanel.webview.asWebviewUri(onDiskPath);
+        const publicLocation = vscode.Uri.joinPath(this.context.extensionUri, 'packages', 'ultimate-gb-tile-editor','public');
+       vscode.workspace.fs.readFile(vscode.Uri.joinPath(publicLocation, 'index.html')).then((html) => {
 
-        webviewPanel.webview.html = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Gameboy Tile Designer</title>
-             <script src="${appJs}"></script>
-        </head>
-        <body>
-        <div id="app"></div>
-        <script>
-      vscode = acquireVsCodeApi();
-        window.app('${JSON.stringify(document)}', vscode);
-         </script>
-       </body>
-       
-        `;
+        vscode.workspace.fs.readFile(vscode.Uri.joinPath(publicLocation, 'index.min.js')).then((js) => {
+            webviewPanel.webview.html = html.toString().split('<script src="index.js"></script>').join(`<script src="${webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(publicLocation, 'index.min.js'))}"></script>`);
+            //
+        }); });
 
     }
 
