@@ -5,7 +5,7 @@ import babel from '@rollup/plugin-babel';
 import replace from '@rollup/plugin-replace';
 
 export default {
-   input: 'src/index.js',
+   input: 'src/index.jsx',
    output: {
       file: 'public/index.js',
       format: 'iife'

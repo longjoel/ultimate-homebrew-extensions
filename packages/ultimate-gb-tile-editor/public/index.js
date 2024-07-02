@@ -4280,148 +4280,95 @@
 	    y: evt.clientY - rect.top
 	  };
 	}
-	const TileEdit = ({
-	  dataArray,
-	  indexStart,
-	  onDataChange,
-	  scale
-	}) => {
+
+	function Tile({
+	  tileData,
+	  ontileDataChange,
+	  leftCursorColor,
+	  rightCursorColor
+	}) {
 	  const canvasRef = reactExports.useRef();
-	  reactExports.useEffect(() => {
-	    const ctx = canvasRef.current.getContext("2d");
-	    ctx.fillStyle = "#e0f8d0";
-	    ctx.fillRect(0, 0, 8 * scale, 8 * scale);
-	    const colors = ["#e0f8d0", "#88c070", "#346856", "#081820"];
-	    for (let i = 0; i < 8; i++) {
-	      for (let j = 0; j < 8; j++) {
-	        ctx.fillStyle = colors[dataArray[indexStart + (i * 8 + j)]];
-	        ctx.fillRect(j * scale, i * scale, (j + 1) * scale, (i + 1) * scale);
-	      }
-	    }
-	  }, [canvasRef, dataArray, indexStart, scale]);
-	  const canvasOnClick = e => {
+	  let isMouseDown = false;
+	  const plotPixel = e => {
+	    const scale = canvasRef.current.width / 8;
 	    const {
 	      x,
 	      y
 	    } = getMousePos(canvasRef.current, e);
 	    const cellx = Math.floor(x / scale);
 	    const celly = Math.floor(y / scale);
-	    let newData = [...dataArray];
-	    newData[indexStart + (celly * 8 + cellx)]++;
-	    if (newData[indexStart + (celly * 8 + cellx)] > 3) {
-	      newData[indexStart + (celly * 8 + cellx)] = 0;
+	    let newData = [...tileData];
+	    newData[celly * 8 + cellx] = leftCursorColor;
+	    ontileDataChange(newData);
+	  };
+	  const canvas_onMouseMove = e => {
+	    if (isMouseDown) {
+	      plotPixel(e);
 	    }
-	    onDataChange(newData);
 	  };
-	  return React.createElement("canvas", {
-	    onClick: canvasOnClick,
-	    ref: canvasRef,
-	    width: scale * 8,
-	    height: scale * 8
-	  });
-	};
-	function binToHex(s) {
-	  const byteMap = {
-	    "0000": "0",
-	    "0001": "1",
-	    "0010": "2",
-	    "0011": "3",
-	    "0100": "4",
-	    "0101": "5",
-	    "0110": "6",
-	    "0111": "7",
-	    "1000": "8",
-	    "1001": "9",
-	    "1010": "A",
-	    "1011": "B",
-	    "1100": "C",
-	    "1101": "D",
-	    "1110": "E",
-	    "1111": "F"
+	  const canvas_onMouseDown = e => {
+	    isMouseDown = true;
+	    plotPixel(e);
 	  };
-	  let parts = [];
-	  for (let i = 0; i < s.length; i += 8) {
-	    let subStrA = byteMap[s.slice(i, i + 4)];
-	    let subStrB = byteMap[s.slice(i + 4, i + 8)];
-	    parts.push(`0x${subStrA}${subStrB}`);
-	  }
-	  return parts.join(", ");
-	}
-	const pixelsToCByteArray = (name, data) => {
-	  const bitMap = {
-	    0: "00",
-	    1: "01",
-	    2: "10",
-	    3: "11"
+	  const canvas_onMouseUp = e => {
+	    isMouseDown = false;
 	  };
-	  let arr = data.map(d => bitMap[d]);
-	  let outStr = `const char *${name} = {${binToHex(arr.join(""))}};`;
-	  return outStr;
-	};
-	const TileEditor = ({
-	  width,
-	  height,
-	  scale
-	}) => {
-	  const [tileData, setTileData] = reactExports.useState(Array(64 * (width * height)).fill(0));
-	  const [strOut, setStrOut] = reactExports.useState("");
-	  reactExports.useEffect(() => {
-	    setTileData(Array(64 * (width * height)).fill(0));
-	  }, [width, height]);
-	  const onDataChange = data => {
-	    setTileData(data);
-	    setStrOut(pixelsToCByteArray("test", data));
-	  };
-	  let children = [];
-	  let buildRow = (rowNum, width) => {
-	    let row = [];
-	    for (let w = 0; w < width; w++) {
-	      row.push( React.createElement(TileEdit, {
-	        key: `${w},${rowNum}`,
-	        dataArray: tileData,
-	        indexStart: (rowNum * width + w) * 64,
-	        onDataChange: onDataChange,
-	        scale: scale
-	      }));
+	  const renderCanvas = () => {
+	    if (!canvasRef && !canvasRef.current) {
+	      requestAnimationFrame(renderCanvas);
+	      return;
 	    }
-	    return row;
-	  };
-	  for (let h = 0; h < height; h++) {
-	    children.push( React.createElement("div", {
-	      style: {
-	        margin: "0px",
-	        padding: "0px",
-	        lineHeight: "0px"
+	    const ctx = canvasRef.current.getContext("2d");
+	    if (!ctx) {
+	      requestAnimationFrame(renderCanvas);
+	      return;
+	    }
+	    ctx.fillStyle = "black";
+	    ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+	    const scale = canvasRef.current.width / 8;
+	    for (let y = 0; y < 8; y++) {
+	      for (let x = 0; x < 8; x++) {
+	        switch (tileData[y * 8 + x]) {
+	          case 0:
+	            ctx.fillStyle = "black";
+	            break;
+	          case 1:
+	            ctx.fillStyle = "darkgreen";
+	            break;
+	          case 2:
+	            ctx.fillStyle = "green";
+	            break;
+	          case 3:
+	            ctx.fillStyle = "lightgreen";
+	            break;
+	        }
+	        ctx.fillRect(x * scale + 1, y * scale + 1, scale - 2, scale - 2);
 	      }
-	    }, buildRow(h, width)));
-	  }
-	  return React.createElement("div", null, children, React.createElement("div", null, React.createElement("p", null, strOut)));
-	};
-	function App() {
-	  const [size, setSize] = reactExports.useState({
-	    w: 1,
-	    h: 1
-	  });
-	  const [scale, setScale] = reactExports.useState(16);
-	  return React.createElement("div", {
-	    className: "App"
-	  }, React.createElement("button", {
-	    onClick: () => setSize({
-	      ...size,
-	      w: size.w + 1
-	    })
-	  }, "Wider"), React.createElement("button", {
-	    onClick: () => setSize({
-	      ...size,
-	      h: size.h + 1
-	    })
-	  }, "Taller"), React.createElement(TileEditor, {
-	    width: size.w,
-	    height: size.h,
-	    scale: scale
+	    }
+	    requestAnimationFrame(renderCanvas);
+	  };
+	  requestAnimationFrame(renderCanvas);
+	  return React.createElement("div", null, React.createElement("canvas", {
+	    ref: canvasRef,
+	    width: 400,
+	    height: 400,
+	    onMouseMove: canvas_onMouseMove,
+	    onMouseDown: canvas_onMouseDown,
+	    onMouseUp: canvas_onMouseUp
 	  }));
 	}
 
+	const App = () => {
+	  const [tileData, setTileData] = React.useState(new Array(64).fill(0));
+	  return React.createElement(Tile, {
+	    tileData: tileData,
+	    ontileDataChange: data => {
+	      setTileData(data);
+	    },
+	    leftCursorColor: 1,
+	    rightCursorColor: 0
+	  });
+	};
 	client.createRoot(document.querySelector('#app')).render( React.createElement(App));
 
 })();
