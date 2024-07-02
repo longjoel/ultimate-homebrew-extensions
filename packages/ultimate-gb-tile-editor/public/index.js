@@ -4273,82 +4273,98 @@
 	  };
 	}
 
-	function getMousePos(canvas, evt) {
-	  var rect = canvas.getBoundingClientRect();
-	  return {
-	    x: evt.clientX - rect.left,
-	    y: evt.clientY - rect.top
-	  };
-	}
-
-	function Tile({
+	function TileEditor({
 	  tileData,
 	  ontileDataChange,
 	  leftCursorColor,
 	  rightCursorColor
 	}) {
 	  const canvasRef = reactExports.useRef();
-	  let isMouseDown = false;
-	  const plotPixel = e => {
-	    const scale = canvasRef.current.width / 8;
-	    const {
-	      x,
-	      y
-	    } = getMousePos(canvasRef.current, e);
-	    const cellx = Math.floor(x / scale);
-	    const celly = Math.floor(y / scale);
-	    let newData = [...tileData];
-	    newData[celly * 8 + cellx] = leftCursorColor;
-	    ontileDataChange(newData);
-	  };
+	  const [mouseState, setMouseState] = React.useState({
+	    x: 0,
+	    y: 0,
+	    leftClick: false,
+	    rightClick: false
+	  });
 	  const canvas_onMouseMove = e => {
-	    if (isMouseDown) {
-	      plotPixel(e);
-	    }
+	    var rect = canvasRef.current.getBoundingClientRect();
+	    setMouseState({
+	      ...mouseState,
+	      x: e.clientX - rect.left,
+	      y: e.clientY - rect.top
+	    });
 	  };
 	  const canvas_onMouseDown = e => {
-	    isMouseDown = true;
-	    plotPixel(e);
+	    if (e.button === 0) {
+	      setMouseState({
+	        ...mouseState,
+	        leftClick: true
+	      });
+	    } else if (e.button === 2) {
+	      setMouseState({
+	        ...mouseState,
+	        rightClick: true
+	      });
+	    }
 	  };
 	  const canvas_onMouseUp = e => {
-	    isMouseDown = false;
+	    if (e.button === 0) {
+	      setMouseState({
+	        ...mouseState,
+	        leftClick: false
+	      });
+	    } else if (e.button === 2) {
+	      setMouseState({
+	        ...mouseState,
+	        rightClick: false
+	      });
+	    }
 	  };
 	  const renderCanvas = () => {
-	    if (!canvasRef && !canvasRef.current) {
-	      requestAnimationFrame(renderCanvas);
-	      return;
-	    }
-	    const ctx = canvasRef.current.getContext("2d");
-	    if (!ctx) {
-	      requestAnimationFrame(renderCanvas);
-	      return;
-	    }
-	    ctx.fillStyle = "black";
-	    ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-	    const scale = canvasRef.current.width / 8;
-	    for (let y = 0; y < 8; y++) {
-	      for (let x = 0; x < 8; x++) {
-	        switch (tileData[y * 8 + x]) {
-	          case 0:
-	            ctx.fillStyle = "black";
-	            break;
-	          case 1:
-	            ctx.fillStyle = "darkgreen";
-	            break;
-	          case 2:
-	            ctx.fillStyle = "green";
-	            break;
-	          case 3:
-	            ctx.fillStyle = "lightgreen";
-	            break;
+	    if (canvasRef && canvasRef.current) {
+	      const ctx = canvasRef.current.getContext("2d");
+	      if (ctx) {
+	        if (mouseState.leftClick || mouseState.rightClick) {
+	          const scale = canvasRef.current.width / 8;
+	          const x = Math.floor(mouseState.x / scale);
+	          const y = Math.floor(mouseState.y / scale);
+	          const index = y * 8 + x;
+	          let newTileData = [...tileData];
+	          newTileData[index] = mouseState.leftClick ? leftCursorColor : mouseState.rightClick ? rightCursorColor : tileData[index];
+	          ontileDataChange(newTileData);
 	        }
-	        ctx.fillRect(x * scale + 1, y * scale + 1, scale - 2, scale - 2);
+	        ctx.fillStyle = "black";
+	        ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+	        const scale = canvasRef.current.width / 8;
+	        for (let y = 0; y < 8; y++) {
+	          for (let x = 0; x < 8; x++) {
+	            switch (tileData[y * 8 + x]) {
+	              case 0:
+	                ctx.fillStyle = "black";
+	                break;
+	              case 1:
+	                ctx.fillStyle = "darkgreen";
+	                break;
+	              case 2:
+	                ctx.fillStyle = "green";
+	                break;
+	              case 3:
+	                ctx.fillStyle = "lightgreen";
+	                break;
+	            }
+	            ctx.fillRect(x * scale + 1, y * scale + 1, scale - 2, scale - 2);
+	          }
+	        }
 	      }
 	    }
 	    requestAnimationFrame(renderCanvas);
 	  };
 	  requestAnimationFrame(renderCanvas);
 	  return React.createElement("div", null, React.createElement("canvas", {
+	    onContextMenu: e => {
+	      e.preventDefault();
+	      e.stopPropagation();
+	    },
 	    ref: canvasRef,
 	    width: 400,
 	    height: 400,
@@ -4360,13 +4376,13 @@
 
 	const App = () => {
 	  const [tileData, setTileData] = React.useState(new Array(64).fill(0));
-	  return React.createElement(Tile, {
+	  return React.createElement(TileEditor, {
 	    tileData: tileData,
 	    ontileDataChange: data => {
 	      setTileData(data);
 	    },
 	    leftCursorColor: 1,
-	    rightCursorColor: 0
+	    rightCursorColor: 2
 	  });
 	};
 	client.createRoot(document.querySelector('#app')).render( React.createElement(App));

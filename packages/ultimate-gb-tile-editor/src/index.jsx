@@ -1,17 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import {Tile} from './components/tile';
+import {TileEditor} from './components/tile-editor';
 
 const App = () => {
    const [tileData, setTileData] = React.useState(new Array(64).fill(0));
 
    return (
-      <Tile
+      <TileEditor
          tileData={tileData}
          ontileDataChange={(data) => {setTileData(data);}}
          leftCursorColor={1}
-         rightCursorColor={0}
+         rightCursorColor={2}
       />
    );
 

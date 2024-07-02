@@ -6,6 +6,11 @@ export function getMousePos(canvas, evt) {
         y: evt.clientY - rect.top
     };
 }
+export const buttonNames = ["left", "right", "wheel", "back", "forward"];
+export function mouseButtonPressed(event, buttonName) {
+    // Use binary `&` with the relevant power of 2 to check if a given button is pressed
+    return Boolean(event.buttons & (1 << buttonNames.indexOf(buttonName)));
+  }
 
 
 export function binToHex(s) {
