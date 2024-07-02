@@ -4288,11 +4288,21 @@
 	  });
 	  const canvas_onMouseMove = e => {
 	    var rect = canvasRef.current.getBoundingClientRect();
-	    setMouseState({
+	    var newMouseState = {
 	      ...mouseState,
 	      x: e.clientX - rect.left,
 	      y: e.clientY - rect.top
-	    });
+	    };
+	    if (mouseState.leftClick || mouseState.rightClick) {
+	      const scale = canvasRef.current.width / 8;
+	      const x = Math.floor(mouseState.x / scale);
+	      const y = Math.floor(mouseState.y / scale);
+	      const index = y * 8 + x;
+	      let newTileData = [...tileData];
+	      newTileData[index] = mouseState.leftClick ? leftCursorColor : mouseState.rightClick ? rightCursorColor : tileData[index];
+	      ontileDataChange(newTileData);
+	    }
+	    setMouseState(newMouseState);
 	  };
 	  const canvas_onMouseDown = e => {
 	    if (e.button === 0) {
@@ -4324,15 +4334,6 @@
 	    if (canvasRef && canvasRef.current) {
 	      const ctx = canvasRef.current.getContext("2d");
 	      if (ctx) {
-	        if (mouseState.leftClick || mouseState.rightClick) {
-	          const scale = canvasRef.current.width / 8;
-	          const x = Math.floor(mouseState.x / scale);
-	          const y = Math.floor(mouseState.y / scale);
-	          const index = y * 8 + x;
-	          let newTileData = [...tileData];
-	          newTileData[index] = mouseState.leftClick ? leftCursorColor : mouseState.rightClick ? rightCursorColor : tileData[index];
-	          ontileDataChange(newTileData);
-	        }
 	        ctx.fillStyle = "black";
 	        ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 	        const scale = canvasRef.current.width / 8;
@@ -4340,16 +4341,16 @@
 	          for (let x = 0; x < 8; x++) {
 	            switch (tileData[y * 8 + x]) {
 	              case 0:
-	                ctx.fillStyle = "black";
+	                ctx.fillStyle = "white";
 	                break;
 	              case 1:
-	                ctx.fillStyle = "darkgreen";
+	                ctx.fillStyle = "lightgray";
 	                break;
 	              case 2:
-	                ctx.fillStyle = "green";
+	                ctx.fillStyle = "gray";
 	                break;
 	              case 3:
-	                ctx.fillStyle = "lightgreen";
+	                ctx.fillStyle = "black";
 	                break;
 	            }
 	            ctx.fillRect(x * scale + 1, y * scale + 1, scale - 2, scale - 2);
@@ -4357,9 +4358,10 @@
 	        }
 	      }
 	    }
-	    requestAnimationFrame(renderCanvas);
 	  };
-	  requestAnimationFrame(renderCanvas);
+	  reactExports.useEffect(() => {
+	    renderCanvas();
+	  }, [tileData, leftCursorColor, rightCursorColor, mouseState]);
 	  return React.createElement("div", null, React.createElement("canvas", {
 	    onContextMenu: e => {
 	      e.preventDefault();
@@ -4376,14 +4378,38 @@
 
 	const App = () => {
 	  const [tileData, setTileData] = React.useState(new Array(64).fill(0));
-	  return React.createElement(TileEditor, {
+	  const [leftColor, setLeftColor] = React.useState(1);
+	  const [rightColor, setRightColor] = React.useState(0);
+	  return React.createElement("div", null, React.createElement(TileEditor, {
 	    tileData: tileData,
 	    ontileDataChange: data => {
 	      setTileData(data);
 	    },
-	    leftCursorColor: 1,
-	    rightCursorColor: 2
-	  });
+	    leftCursorColor: leftColor,
+	    rightCursorColor: rightColor
+	  }), React.createElement("div", null, React.createElement("span", {
+	    style: {
+	      'margin-left': '16px'
+	    }
+	  }), React.createElement("button", {
+	    onClick: () => setLeftColor((leftColor + 1) % 4),
+	    style: {
+	      width: "100px",
+	      height: "100px",
+	      backgroundColor: leftColor === 0 ? "white" : leftColor === 1 ? "lightgray" : leftColor === 2 ? "gray" : "black"
+	    }
+	  }, "Left"), React.createElement("span", {
+	    style: {
+	      'margin-left': '16px'
+	    }
+	  }), React.createElement("button", {
+	    onClick: () => setRightColor((rightColor + 1) % 4),
+	    style: {
+	      width: "100px",
+	      height: "100px",
+	      backgroundColor: rightColor === 0 ? "white" : rightColor === 1 ? "lightgray" : rightColor === 2 ? "gray" : "black"
+	    }
+	  }, "Right")));
 	};
 	client.createRoot(document.querySelector('#app')).render( React.createElement(App));
 
