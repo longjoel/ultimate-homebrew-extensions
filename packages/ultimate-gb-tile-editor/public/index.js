@@ -4385,31 +4385,23 @@
 	  setLeftColor,
 	  rightColor,
 	  setRightColor
-	}) => React.createElement("div", null, React.createElement("span", {
-	  style: {
-	    'marginLeft': '16px'
-	  }
-	}), React.createElement("button", {
+	}) => React.createElement("div", null, React.createElement("button", {
 	  onClick: () => setLeftColor((leftColor + 1) % 4),
 	  style: {
-	    width: "100px",
+	    width: "50%",
 	    height: "100px",
 	    backgroundColor: leftColor === 0 ? "white" : leftColor === 1 ? "lightgray" : leftColor === 2 ? "gray" : "black"
 	  }
-	}, "Left"), React.createElement("span", {
-	  style: {
-	    'marginLeft': '16px'
-	  }
-	}), React.createElement("button", {
+	}, "Left"), React.createElement("button", {
 	  onClick: () => setRightColor((rightColor + 1) % 4),
 	  style: {
-	    width: "100px",
+	    width: "50%",
 	    height: "100px",
 	    backgroundColor: rightColor === 0 ? "white" : rightColor === 1 ? "lightgray" : rightColor === 2 ? "gray" : "black"
 	  }
 	}, "Right"));
 
-	const TileCommander = ({
+	const TileCommands = ({
 	  tileData,
 	  setTileData
 	}) => {
@@ -4491,48 +4483,38 @@
 	    }
 	    setTileData(newTileData);
 	  };
+	  const buttonStyle = {
+	    width: '50%'
+	  };
 	  return React.createElement("div", null, " ", React.createElement("button", {
 	    style: {
-	      width: 125
+	      width: '100%'
 	    },
 	    onClick: clearTiles
 	  }, "Clear"), React.createElement("button", {
-	    style: {
-	      width: 125
-	    },
+	    style: buttonStyle,
 	    onClick: rollTilesUp
 	  }, "Roll up"), React.createElement("button", {
-	    style: {
-	      width: 125
-	    },
+	    style: buttonStyle,
 	    onClick: rollTilesDown
 	  }, "Roll down"), React.createElement("button", {
-	    style: {
-	      width: 125
-	    },
+	    style: buttonStyle,
 	    onClick: rollTilesLeft
 	  }, "Roll left"), React.createElement("button", {
-	    style: {
-	      width: 125
-	    },
+	    style: buttonStyle,
 	    onClick: rollTilesRight
 	  }, "Roll right"), React.createElement("button", {
-	    style: {
-	      width: 125
-	    },
+	    style: buttonStyle,
 	    onClick: flipTilesHorizontal
 	  }, "Flip Horizontal"), React.createElement("button", {
-	    style: {
-	      width: 125
-	    },
+	    style: buttonStyle,
 	    onClick: flipTilesVertical
 	  }, "Flip Vertical"), React.createElement("button", {
-	    style: {
-	      width: 125
-	    },
+	    style: buttonStyle,
 	    onClick: rotateCW
-	  }, "Rotate CW"));
+	  }, "Rotate CW"), React.createElement("br", null));
 	};
+
 	const App = () => {
 	  const [tileData, setTileData] = React.useState(new Array(64).fill(0));
 	  const [leftColor, setLeftColor] = React.useState(1);
@@ -4543,9 +4525,14 @@
 	    className: "row"
 	  }, React.createElement("div", {
 	    className: "col-2"
-	  }, React.createElement(TileCommander, {
+	  }, React.createElement(TileCommands, {
 	    tileData: tileData,
 	    setTileData: setTileData
+	  }), React.createElement(TileColorPicker, {
+	    leftColor: leftColor,
+	    rightColor: rightColor,
+	    setLeftColor: setLeftColor,
+	    setRightColor: setRightColor
 	  })), React.createElement("div", {
 	    className: "col-8"
 	  }, React.createElement(TileEditor, {
@@ -4555,11 +4542,6 @@
 	    },
 	    leftCursorColor: leftColor,
 	    rightCursorColor: rightColor
-	  }), React.createElement(TileColorPicker, {
-	    leftColor: leftColor,
-	    rightColor: rightColor,
-	    setLeftColor: setLeftColor,
-	    setRightColor: setRightColor
 	  })), React.createElement("div", {
 	    className: "col-2"
 	  })));
