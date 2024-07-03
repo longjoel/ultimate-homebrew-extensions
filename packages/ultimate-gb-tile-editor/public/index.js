@@ -4409,10 +4409,10 @@
 	  }
 	}, "Right"));
 
-	const App = () => {
-	  const [tileData, setTileData] = React.useState(new Array(64).fill(0));
-	  const [leftColor, setLeftColor] = React.useState(1);
-	  const [rightColor, setRightColor] = React.useState(0);
+	const TileCommander = ({
+	  tileData,
+	  setTileData
+	}) => {
 	  const clearTiles = () => {
 	    setTileData(new Array(64).fill(0));
 	  };
@@ -4491,13 +4491,7 @@
 	    }
 	    setTileData(newTileData);
 	  };
-	  return React.createElement("div", {
-	    className: "fluid-container"
-	  }, React.createElement("div", {
-	    className: "row"
-	  }, React.createElement("div", {
-	    className: "col-2"
-	  }, React.createElement("button", {
+	  return React.createElement("div", null, " ", React.createElement("button", {
 	    style: {
 	      width: 125
 	    },
@@ -4537,7 +4531,22 @@
 	      width: 125
 	    },
 	    onClick: rotateCW
-	  }, "Rotate CW")), React.createElement("div", {
+	  }, "Rotate CW"));
+	};
+	const App = () => {
+	  const [tileData, setTileData] = React.useState(new Array(64).fill(0));
+	  const [leftColor, setLeftColor] = React.useState(1);
+	  const [rightColor, setRightColor] = React.useState(0);
+	  return React.createElement("div", {
+	    className: "fluid-container"
+	  }, React.createElement("div", {
+	    className: "row"
+	  }, React.createElement("div", {
+	    className: "col-2"
+	  }, React.createElement(TileCommander, {
+	    tileData: tileData,
+	    setTileData: setTileData
+	  })), React.createElement("div", {
 	    className: "col-8"
 	  }, React.createElement(TileEditor, {
 	    tileData: tileData,
