@@ -4486,7 +4486,7 @@
 	  const buttonStyle = {
 	    width: '50%'
 	  };
-	  return React.createElement("div", null, " ", React.createElement("button", {
+	  return React.createElement("div", null, React.createElement("button", {
 	    style: {
 	      width: '100%'
 	    },
@@ -4515,10 +4515,74 @@
 	  }, "Rotate CW"), React.createElement("br", null));
 	};
 
+	function TilesPreview({
+	  tileCollection,
+	  currentTileIndex,
+	  ontileChange
+	}) {
+	  const canvasRef = React.useRef();
+	  reactExports.useEffect(() => {
+	    const canvas = canvasRef.current;
+	    const scaleWidth = canvas.width / 8;
+	    const scaleHeight = canvas.height / 32;
+	    const pixelWidth = scaleWidth / 8;
+	    const pixelHeight = scaleHeight / 8;
+	    if (canvas) {
+	      const ctx = canvas.getContext('2d');
+	      if (ctx) {
+	        ctx.fillStyle = "black";
+	        ctx.fillRect(0, 0, canvas.width, canvas.height);
+	        for (let gridY = 0; gridY < 32; gridY++) {
+	          for (let gridX = 0; gridX < 8; gridX++) {
+	            let i = gridY * 8 + gridX;
+	            for (let y = 0; y < 8; y++) {
+	              for (let x = 0; x < 8; x++) {
+	                const tile = tileCollection[i];
+	                if (!tile) {
+	                  continue;
+	                }
+	                const color = tile[y * 8 + x];
+	                ctx.fillStyle = color === 0 ? "white" : color === 1 ? "lightgray" : color === 2 ? "gray" : "black";
+	                ctx.fillRect(gridX * scaleWidth + x * pixelWidth, gridY * scaleHeight + y * pixelHeight, pixelWidth, pixelHeight);
+	              }
+	            }
+	            if (i === currentTileIndex) {
+	              ctx.strokeStyle = "red";
+	              ctx.strokeRect(gridX * scaleWidth, gridY * scaleHeight, scaleWidth, scaleHeight);
+	            }
+	          }
+	        }
+	        ctx.strokeStyle = "red";
+	        ctx.strokeRect(0, currentTileIndex * scaleHeight, scaleWidth, scaleHeight);
+	      }
+	    }
+	  }, [tileCollection, currentTileIndex]);
+	  return React.createElement("div", null, React.createElement("canvas", {
+	    width: 8 * 16,
+	    height: 32 * 16,
+	    ref: canvasRef
+	  }));
+	}
+
 	const App = () => {
-	  const [tileData, setTileData] = React.useState(new Array(64).fill(0));
+	  const [tileCollection, setTileCollection] = React.useState([new Array(256).fill(new Array(64).fill(0))]);
+	  const [currentTileIndex, setCurrentTileIndex] = React.useState(0);
+	  const [tileData, setTileData] = React.useState(tileCollection[currentTileIndex]);
 	  const [leftColor, setLeftColor] = React.useState(1);
 	  const [rightColor, setRightColor] = React.useState(0);
+	  const switchTile = index => {
+	    let newTileCollection = [...tileCollection];
+	    newTileCollection[currentTileIndex] = tileData;
+	    setTileCollection(newTileCollection);
+	    setCurrentTileIndex(index);
+	    setTileData(tileCollection[index]);
+	  };
+	  const updateTileData = data => {
+	    setTileData(data);
+	    const newCollection = [...tileCollection];
+	    newCollection[currentTileIndex] = data;
+	    setTileCollection(newCollection);
+	  };
 	  return React.createElement("div", {
 	    className: "fluid-container"
 	  }, React.createElement("div", {
@@ -4527,7 +4591,7 @@
 	    className: "col-2"
 	  }, React.createElement(TileCommands, {
 	    tileData: tileData,
-	    setTileData: setTileData
+	    setTileData: updateTileData
 	  }), React.createElement(TileColorPicker, {
 	    leftColor: leftColor,
 	    rightColor: rightColor,
@@ -4537,14 +4601,22 @@
 	    className: "col-8"
 	  }, React.createElement(TileEditor, {
 	    tileData: tileData,
-	    ontileDataChange: data => {
-	      setTileData(data);
-	    },
+	    ontileDataChange: updateTileData,
 	    leftCursorColor: leftColor,
 	    rightCursorColor: rightColor
 	  })), React.createElement("div", {
-	    className: "col-2"
-	  })));
+	    className: "col-2",
+	    style: {
+	      maxHeight: 512,
+	      overflow: 'scroll'
+	    }
+	  }, React.createElement(TilesPreview, {
+	    tileCollection: tileCollection,
+	    currentTileIndex: currentTileIndex,
+	    ontileChange: index => {
+	      switchTile(index);
+	    }
+	  }))));
 	};
 	client.createRoot(document.querySelector('#app')).render( React.createElement(App));
 
