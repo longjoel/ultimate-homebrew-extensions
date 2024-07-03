@@ -4598,18 +4598,14 @@
 	    setLeftColor: setLeftColor,
 	    setRightColor: setRightColor
 	  })), React.createElement("div", {
-	    className: "col-8"
+	    className: "col-4"
 	  }, React.createElement(TileEditor, {
 	    tileData: tileData,
 	    ontileDataChange: updateTileData,
 	    leftCursorColor: leftColor,
 	    rightCursorColor: rightColor
 	  })), React.createElement("div", {
-	    className: "col-2",
-	    style: {
-	      maxHeight: 512,
-	      overflow: 'scroll'
-	    }
+	    className: "col-2"
 	  }, React.createElement(TilesPreview, {
 	    tileCollection: tileCollection,
 	    currentTileIndex: currentTileIndex,

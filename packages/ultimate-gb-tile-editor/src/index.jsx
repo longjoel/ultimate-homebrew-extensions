@@ -27,10 +27,12 @@ const App = () => {
 
    };
 
-   const updateTileData = (data) => { setTileData(data); 
-         const newCollection = [...tileCollection];
-         newCollection[currentTileIndex] = data;
-         setTileCollection(newCollection); }
+   const updateTileData = (data) => {
+      setTileData(data);
+      const newCollection = [...tileCollection];
+      newCollection[currentTileIndex] = data;
+      setTileCollection(newCollection);
+   };
 
    return (
       <div className='fluid-container'>
@@ -38,9 +40,9 @@ const App = () => {
             <div className='col-2' >
                <TileCommands tileData={tileData} setTileData={updateTileData} />
                <TileColorPicker leftColor={leftColor} rightColor={rightColor} setLeftColor={setLeftColor} setRightColor={setRightColor} />
-             
+
             </div>
-            <div className='col-8' >
+            <div className='col-4' >
 
                <TileEditor
                   tileData={tileData}
@@ -50,15 +52,15 @@ const App = () => {
                />
 
             </div>
-            <div className='col-2' style={{ maxHeight:512,overflow:'scroll'}}>
-            <TilesPreview 
-                  tileCollection={tileCollection} 
-                  currentTileIndex={currentTileIndex} 
+            <div className='col-2' >
+               <TilesPreview
+                  tileCollection={tileCollection}
+                  currentTileIndex={currentTileIndex}
                   ontileChange={(index) => { switchTile(index); }} />
 
             </div>
 
-       
+
          </div>
       </div>);
 
