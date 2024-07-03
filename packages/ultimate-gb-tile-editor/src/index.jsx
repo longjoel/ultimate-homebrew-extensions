@@ -83,6 +83,16 @@ const App = () => {
       setTileData(newTileData);
    };
 
+   const rotateCW = () => {
+      let newTileData = [...tileData];
+      for (let y = 0; y < 8; y++) {
+         for (let x = 0; x < 8; x++) {
+            newTileData[y * 8 + x] = tileData[(7-x) * 8 + y];
+         }
+      }
+      setTileData(newTileData);
+   };
+
    return (
       <div className='fluid-container'>
          <div className='row' >
@@ -94,6 +104,7 @@ const App = () => {
                <button style={{width:125}} onClick={rollTilesRight}>Roll right</button>
                <button style={{width:125}} onClick={flipTilesHorizontal}>Flip Horizontal</button>
                <button style={{width:125}} onClick={flipTilesVertical}>Flip Vertical</button>
+               <button style={{width:125}} onClick={rotateCW}>Rotate CW</button>
             </div>
             <div className='col-8' >
 

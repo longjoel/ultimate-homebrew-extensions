@@ -4387,11 +4387,9 @@
 	  setRightColor
 	}) => React.createElement("div", null, React.createElement("span", {
 	  style: {
-	    'margin-left': '16px'
+	    'marginLeft': '16px'
 	  }
 	}), React.createElement("button", {
-	  type: "button",
-	  className: "btn btn-outline-primary",
 	  onClick: () => setLeftColor((leftColor + 1) % 4),
 	  style: {
 	    width: "100px",
@@ -4400,11 +4398,9 @@
 	  }
 	}, "Left"), React.createElement("span", {
 	  style: {
-	    'margin-left': '16px'
+	    'marginLeft': '16px'
 	  }
 	}), React.createElement("button", {
-	  type: "button",
-	  className: "btn btn-outline-secondary",
 	  onClick: () => setRightColor((rightColor + 1) % 4),
 	  style: {
 	    width: "100px",
@@ -4486,6 +4482,15 @@
 	    }
 	    setTileData(newTileData);
 	  };
+	  const rotateCW = () => {
+	    let newTileData = [...tileData];
+	    for (let y = 0; y < 8; y++) {
+	      for (let x = 0; x < 8; x++) {
+	        newTileData[y * 8 + x] = tileData[(7 - x) * 8 + y];
+	      }
+	    }
+	    setTileData(newTileData);
+	  };
 	  return React.createElement("div", {
 	    className: "fluid-container"
 	  }, React.createElement("div", {
@@ -4527,7 +4532,12 @@
 	      width: 125
 	    },
 	    onClick: flipTilesVertical
-	  }, "Flip Vertical")), React.createElement("div", {
+	  }, "Flip Vertical"), React.createElement("button", {
+	    style: {
+	      width: 125
+	    },
+	    onClick: rotateCW
+	  }, "Rotate CW")), React.createElement("div", {
 	    className: "col-8"
 	  }, React.createElement(TileEditor, {
 	    tileData: tileData,
