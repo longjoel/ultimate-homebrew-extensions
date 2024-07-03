@@ -4286,6 +4286,15 @@
 	    leftClick: false,
 	    rightClick: false
 	  });
+	  function updateTileData() {
+	    const scale = canvasRef.current.width / 8;
+	    const x = Math.floor(mouseState.x / scale);
+	    const y = Math.floor(mouseState.y / scale);
+	    const index = y * 8 + x;
+	    let newTileData = [...tileData];
+	    newTileData[index] = mouseState.leftClick ? leftCursorColor : mouseState.rightClick ? rightCursorColor : tileData[index];
+	    ontileDataChange(newTileData);
+	  }
 	  const canvas_onMouseMove = e => {
 	    var rect = canvasRef.current.getBoundingClientRect();
 	    var newMouseState = {
@@ -4294,13 +4303,7 @@
 	      y: e.clientY - rect.top
 	    };
 	    if (mouseState.leftClick || mouseState.rightClick) {
-	      const scale = canvasRef.current.width / 8;
-	      const x = Math.floor(mouseState.x / scale);
-	      const y = Math.floor(mouseState.y / scale);
-	      const index = y * 8 + x;
-	      let newTileData = [...tileData];
-	      newTileData[index] = mouseState.leftClick ? leftCursorColor : mouseState.rightClick ? rightCursorColor : tileData[index];
-	      ontileDataChange(newTileData);
+	      updateTileData();
 	    }
 	    setMouseState(newMouseState);
 	  };
@@ -4316,6 +4319,7 @@
 	        rightClick: true
 	      });
 	    }
+	    updateTileData();
 	  };
 	  const canvas_onMouseUp = e => {
 	    if (e.button === 0) {
@@ -4376,40 +4380,170 @@
 	  }));
 	}
 
+	const TileColorPicker = ({
+	  leftColor,
+	  setLeftColor,
+	  rightColor,
+	  setRightColor
+	}) => React.createElement("div", null, React.createElement("span", {
+	  style: {
+	    'margin-left': '16px'
+	  }
+	}), React.createElement("button", {
+	  type: "button",
+	  className: "btn btn-outline-primary",
+	  onClick: () => setLeftColor((leftColor + 1) % 4),
+	  style: {
+	    width: "100px",
+	    height: "100px",
+	    backgroundColor: leftColor === 0 ? "white" : leftColor === 1 ? "lightgray" : leftColor === 2 ? "gray" : "black"
+	  }
+	}, "Left"), React.createElement("span", {
+	  style: {
+	    'margin-left': '16px'
+	  }
+	}), React.createElement("button", {
+	  type: "button",
+	  className: "btn btn-outline-secondary",
+	  onClick: () => setRightColor((rightColor + 1) % 4),
+	  style: {
+	    width: "100px",
+	    height: "100px",
+	    backgroundColor: rightColor === 0 ? "white" : rightColor === 1 ? "lightgray" : rightColor === 2 ? "gray" : "black"
+	  }
+	}, "Right"));
+
 	const App = () => {
 	  const [tileData, setTileData] = React.useState(new Array(64).fill(0));
 	  const [leftColor, setLeftColor] = React.useState(1);
 	  const [rightColor, setRightColor] = React.useState(0);
-	  return React.createElement("div", null, React.createElement(TileEditor, {
+	  const clearTiles = () => {
+	    setTileData(new Array(64).fill(0));
+	  };
+	  const rollTilesUp = () => {
+	    let newTileData = [...tileData];
+	    for (let y = 0; y < 8; y++) {
+	      for (let x = 0; x < 8; x++) {
+	        newTileData[y * 8 + x] = tileData[(y % 7 + 1) * 8 + x];
+	      }
+	    }
+	    setTileData(newTileData);
+	  };
+	  const rollTilesDown = () => {
+	    let newTileData = [...tileData];
+	    for (let y = 0; y < 8; y++) {
+	      for (let x = 0; x < 8; x++) {
+	        let srcY = y - 1;
+	        if (srcY < 0) {
+	          srcY = 7;
+	        }
+	        newTileData[y * 8 + x] = tileData[srcY * 8 + x];
+	      }
+	    }
+	    setTileData(newTileData);
+	  };
+	  const rollTilesLeft = () => {
+	    let newTileData = [...tileData];
+	    for (let y = 0; y < 8; y++) {
+	      for (let x = 0; x < 8; x++) {
+	        newTileData[y * 8 + x] = tileData[y * 8 + (x + 1) % 8];
+	      }
+	    }
+	    setTileData(newTileData);
+	  };
+	  const flipTilesHorizontal = () => {
+	    let newTileData = [...tileData];
+	    for (let y = 0; y < 8; y++) {
+	      for (let x = 0; x < 4; x++) {
+	        let srcX = 7 - x;
+	        newTileData[y * 8 + x] = tileData[y * 8 + srcX];
+	        newTileData[y * 8 + srcX] = tileData[y * 8 + x];
+	      }
+	    }
+	    setTileData(newTileData);
+	  };
+	  const rollTilesRight = () => {
+	    let newTileData = [...tileData];
+	    for (let y = 0; y < 8; y++) {
+	      for (let x = 0; x < 8; x++) {
+	        let srcX = x - 1;
+	        if (srcX < 0) {
+	          srcX = 7;
+	        }
+	        newTileData[y * 8 + x] = tileData[y * 8 + srcX];
+	      }
+	    }
+	    setTileData(newTileData);
+	  };
+	  const flipTilesVertical = () => {
+	    let newTileData = [...tileData];
+	    for (let y = 0; y < 4; y++) {
+	      for (let x = 0; x < 8; x++) {
+	        let srcY = 7 - y;
+	        newTileData[y * 8 + x] = tileData[srcY * 8 + x];
+	        newTileData[srcY * 8 + x] = tileData[y * 8 + x];
+	      }
+	    }
+	    setTileData(newTileData);
+	  };
+	  return React.createElement("div", {
+	    className: "fluid-container"
+	  }, React.createElement("div", {
+	    className: "row"
+	  }, React.createElement("div", {
+	    className: "col-2"
+	  }, React.createElement("button", {
+	    style: {
+	      width: 125
+	    },
+	    onClick: clearTiles
+	  }, "Clear"), React.createElement("button", {
+	    style: {
+	      width: 125
+	    },
+	    onClick: rollTilesUp
+	  }, "Roll up"), React.createElement("button", {
+	    style: {
+	      width: 125
+	    },
+	    onClick: rollTilesDown
+	  }, "Roll down"), React.createElement("button", {
+	    style: {
+	      width: 125
+	    },
+	    onClick: rollTilesLeft
+	  }, "Roll left"), React.createElement("button", {
+	    style: {
+	      width: 125
+	    },
+	    onClick: rollTilesRight
+	  }, "Roll right"), React.createElement("button", {
+	    style: {
+	      width: 125
+	    },
+	    onClick: flipTilesHorizontal
+	  }, "Flip Horizontal"), React.createElement("button", {
+	    style: {
+	      width: 125
+	    },
+	    onClick: flipTilesVertical
+	  }, "Flip Vertical")), React.createElement("div", {
+	    className: "col-8"
+	  }, React.createElement(TileEditor, {
 	    tileData: tileData,
 	    ontileDataChange: data => {
 	      setTileData(data);
 	    },
 	    leftCursorColor: leftColor,
 	    rightCursorColor: rightColor
-	  }), React.createElement("div", null, React.createElement("span", {
-	    style: {
-	      'margin-left': '16px'
-	    }
-	  }), React.createElement("button", {
-	    onClick: () => setLeftColor((leftColor + 1) % 4),
-	    style: {
-	      width: "100px",
-	      height: "100px",
-	      backgroundColor: leftColor === 0 ? "white" : leftColor === 1 ? "lightgray" : leftColor === 2 ? "gray" : "black"
-	    }
-	  }, "Left"), React.createElement("span", {
-	    style: {
-	      'margin-left': '16px'
-	    }
-	  }), React.createElement("button", {
-	    onClick: () => setRightColor((rightColor + 1) % 4),
-	    style: {
-	      width: "100px",
-	      height: "100px",
-	      backgroundColor: rightColor === 0 ? "white" : rightColor === 1 ? "lightgray" : rightColor === 2 ? "gray" : "black"
-	    }
-	  }, "Right")));
+	  }), React.createElement(TileColorPicker, {
+	    leftColor: leftColor,
+	    rightColor: rightColor,
+	    setLeftColor: setLeftColor,
+	    setRightColor: setRightColor
+	  })), React.createElement("div", {
+	    className: "col-2"
+	  })));
 	};
 	client.createRoot(document.querySelector('#app')).render( React.createElement(App));
 
