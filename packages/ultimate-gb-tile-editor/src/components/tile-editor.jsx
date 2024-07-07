@@ -89,7 +89,7 @@ export function TileEditor({
             }
         }
 
-    }, [tileData,mouseState]);
+    }, [tileData, mouseState]);
 
     return (
         <div>

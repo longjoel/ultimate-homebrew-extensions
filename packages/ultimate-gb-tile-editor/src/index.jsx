@@ -27,6 +27,8 @@ const App = () => {
    const [leftColor, setLeftColor] = React.useState(1);
    const [rightColor, setRightColor] = React.useState(0);
 
+   const [isDirty, setIsDirty] = React.useState(false);
+
    const switchTile = (index) => {
       // update list with current title
       let newTileCollection = [...tileCollection];
@@ -45,7 +47,13 @@ const App = () => {
       const newCollection = [...tileCollection];
       newCollection[currentTileIndex] = data;
       setTileCollection(newCollection);
+      setIsDirty(true);
+      vscode.postMessage({ command: 'dirty_tiles' });
    };
+
+   const exportTiles = () => {
+      vscode.postMessage({ command: 'export_tiles', tiles: tileCollection });
+   }
 
    useEffect(() => {
 
@@ -54,11 +62,12 @@ const App = () => {
          const message = event.data; // The JSON data our extension sent
 
          switch (message.command) {
-            case 'load_tiles':
+            case 'set_tiles':
                setTileCollection(message.tiles);
                break;
             case 'save_tiles':
                vscode.postMessage({ command: 'save_tiles', tiles: tileCollection });
+               setIsDirty(false);
                break;
          }
       });
@@ -73,7 +82,7 @@ const App = () => {
       <div className='fluid-container'>
          <div className='row' >
             <div className='col-2' >
-               <TileCommands tileData={tileData} setTileData={updateTileData} />
+               <TileCommands tileData={tileData} setTileData={updateTileData} exportTiles={exportTiles} />
                <TileColorPicker leftColor={leftColor} rightColor={rightColor} setLeftColor={setLeftColor} setRightColor={setRightColor} />
 
             </div>

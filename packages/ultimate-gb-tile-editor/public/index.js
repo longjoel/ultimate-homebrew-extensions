@@ -4397,7 +4397,8 @@
 
 	const TileCommands = ({
 	  tileData,
-	  setTileData
+	  setTileData,
+	  exportTiles
 	}) => {
 	  const clearTiles = () => {
 	    setTileData(new Array(64).fill(0));
@@ -4525,7 +4526,12 @@
 	  }, "Copy Tile"), React.createElement("button", {
 	    style: buttonStyle,
 	    onClick: pasteTile
-	  }, "Paste Tile"));
+	  }, "Paste Tile"), React.createElement("hr", null), React.createElement("button", {
+	    style: {
+	      width: '100%'
+	    },
+	    onClick: exportTiles
+	  }, "Export Tiles"));
 	};
 
 	function TilesPreview({
@@ -4604,6 +4610,7 @@
 	  const [tileData, setTileData] = React.useState(new Array(64).fill(0).map(() => 0));
 	  const [leftColor, setLeftColor] = React.useState(1);
 	  const [rightColor, setRightColor] = React.useState(0);
+	  const [isDirty, setIsDirty] = React.useState(false);
 	  const switchTile = index => {
 	    let newTileCollection = [...tileCollection];
 	    let localTileData = tileData;
@@ -4620,12 +4627,22 @@
 	    const newCollection = [...tileCollection];
 	    newCollection[currentTileIndex] = data;
 	    setTileCollection(newCollection);
+	    setIsDirty(true);
+	    vscode.postMessage({
+	      command: 'dirty_tiles'
+	    });
+	  };
+	  const exportTiles = () => {
+	    vscode.postMessage({
+	      command: 'export_tiles',
+	      tiles: tileCollection
+	    });
 	  };
 	  reactExports.useEffect(() => {
 	    window.addEventListener('message', event => {
 	      const message = event.data;
 	      switch (message.command) {
-	        case 'load_tiles':
+	        case 'set_tiles':
 	          setTileCollection(message.tiles);
 	          break;
 	        case 'save_tiles':
@@ -4633,6 +4650,7 @@
 	            command: 'save_tiles',
 	            tiles: tileCollection
 	          });
+	          setIsDirty(false);
 	          break;
 	      }
 	    });
@@ -4648,7 +4666,8 @@
 	    className: "col-2"
 	  }, React.createElement(TileCommands, {
 	    tileData: tileData,
-	    setTileData: updateTileData
+	    setTileData: updateTileData,
+	    exportTiles: exportTiles
 	  }), React.createElement(TileColorPicker, {
 	    leftColor: leftColor,
 	    rightColor: rightColor,

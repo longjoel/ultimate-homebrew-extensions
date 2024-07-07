@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-export const TileCommands = ({ tileData, setTileData }) => {
+export const TileCommands = ({ tileData, setTileData,exportTiles }) => {
 
     const clearTiles = () => {
         setTileData(new Array(64).fill(0));
@@ -112,5 +112,8 @@ export const TileCommands = ({ tileData, setTileData }) => {
         <hr/>
         <button style={buttonStyle} onClick={copyTile}>Copy Tile</button>
         <button style={buttonStyle} onClick={pasteTile}>Paste Tile</button>
+        <hr/>
+        <button style={{ width: '100%' }} onClick={exportTiles}>Export Tiles</button>
+
     </div>;
 };
