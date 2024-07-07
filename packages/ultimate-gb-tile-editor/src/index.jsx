@@ -60,13 +60,15 @@ const App = () => {
       window.addEventListener('message', (event) => {
 
          const message = event.data; // The JSON data our extension sent
-
+console.log('message', message);
          switch (message.command) {
             case 'set_tiles':
                setTileCollection(message.tiles);
+               console.log('setting tiles');
                break;
             case 'save_tiles':
                vscode.postMessage({ command: 'save_tiles', tiles: tileCollection });
+               console.log('saving tiles');
                setIsDirty(false);
                break;
          }

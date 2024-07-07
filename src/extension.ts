@@ -10,9 +10,6 @@ import { GameBoyTileDesignerProvider, GameboyTileDesignerDocument } from './game
 
 export function activate(context: vscode.ExtensionContext) {
 
-
-
-
     const gbaEmulator = vscode.window.registerCustomEditorProvider('ultimate-homebrew-extensions.gba-emulator', new GBAEmulatorProvider(context), {
         webviewOptions: {
             retainContextWhenHidden: true
@@ -40,8 +37,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     const gameboyTileDesigner = vscode.window.registerCustomEditorProvider('ultimate-homebrew-extensions.gb-tile-editor', new GameBoyTileDesignerProvider(context), {
         webviewOptions: {
-            retainContextWhenHidden: true
-        }
+            retainContextWhenHidden: true,
+            enableFindWidget:false
+        },
+        supportsMultipleEditorsPerDocument: false
     });
     context.subscriptions.push(gameboyTileDesigner);
 }
