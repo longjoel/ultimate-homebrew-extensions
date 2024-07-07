@@ -1,5 +1,3 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { GBAEmulatorProvider } from './GBAEmulatorProvider';
 import { NESEmulatorProvider } from './NESEmulatorProvider';
@@ -12,21 +10,40 @@ import { GameBoyTileDesignerProvider, GameboyTileDesignerDocument } from './game
 
 export function activate(context: vscode.ExtensionContext) {
 
-	
-	
-	
-	const gbaEmulator = vscode.window.registerCustomEditorProvider('ultimate-homebrew-extensions.gba-emulator', new GBAEmulatorProvider(context));
-	context.subscriptions.push(gbaEmulator);
 
-	const nesemulator = vscode.window.registerCustomEditorProvider('ultimate-homebrew-extensions.nes-emulator', new NESEmulatorProvider(context));
-	context.subscriptions.push(nesemulator);
 
-	const snesEmulator = vscode.window.registerCustomEditorProvider('ultimate-homebrew-extensions.snes-emulator', new SNESEmulatorProvider(context));
-	context.subscriptions.push(snesEmulator);
 
-	const gameboyTileDesigner = vscode.window.registerCustomEditorProvider('ultimate-homebrew-extensions.gb-tile-editor', new GameBoyTileDesignerProvider(context));
-	context.subscriptions.push(gameboyTileDesigner);
+    const gbaEmulator = vscode.window.registerCustomEditorProvider('ultimate-homebrew-extensions.gba-emulator', new GBAEmulatorProvider(context), {
+        webviewOptions: {
+            retainContextWhenHidden: true
+        }
+    });
+    context.subscriptions.push(gbaEmulator);
+
+    const nesEmulator = vscode.window.registerCustomEditorProvider(
+        'ultimate-homebrew-extensions.nes-emulator',
+        new NESEmulatorProvider(context),
+        {
+            webviewOptions: {
+                retainContextWhenHidden: true
+            }
+        }
+    );
+    context.subscriptions.push(nesEmulator);
+
+    const snesEmulator = vscode.window.registerCustomEditorProvider('ultimate-homebrew-extensions.snes-emulator', new SNESEmulatorProvider(context), {
+        webviewOptions: {
+            retainContextWhenHidden: true
+        }
+    });
+    context.subscriptions.push(snesEmulator);
+
+    const gameboyTileDesigner = vscode.window.registerCustomEditorProvider('ultimate-homebrew-extensions.gb-tile-editor', new GameBoyTileDesignerProvider(context), {
+        webviewOptions: {
+            retainContextWhenHidden: true
+        }
+    });
+    context.subscriptions.push(gameboyTileDesigner);
 }
 
-// This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }
