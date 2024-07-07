@@ -4596,14 +4596,7 @@
 	  }));
 	}
 
-	if (!acquireVsCodeApi) {
-	  var acquireVsCodeApi = function () {
-	    return {
-	      postMessage: function (message) {}
-	    };
-	  };
-	}
-	const vscode = acquireVsCodeApi();
+	const vscode = window.acquireVsCodeApi();
 	const App = () => {
 	  const [tileCollection, setTileCollection] = React.useState([...new Array(256).fill(new Array(64).fill(0).map(() => 0))]);
 	  const [currentTileIndex, setCurrentTileIndex] = React.useState(0);
@@ -4629,7 +4622,8 @@
 	    setTileCollection(newCollection);
 	    setIsDirty(true);
 	    vscode.postMessage({
-	      command: 'dirty_tiles'
+	      command: 'dirty_tiles',
+	      tiles: tileCollection
 	    });
 	  };
 	  const exportTiles = () => {

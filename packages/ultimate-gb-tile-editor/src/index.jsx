@@ -14,7 +14,7 @@ if (!acquireVsCodeApi) {
    };
 }
 
-const vscode = acquireVsCodeApi();
+const vscode = window.acquireVsCodeApi();
 
 
 const App = () => {
@@ -48,12 +48,12 @@ const App = () => {
       newCollection[currentTileIndex] = data;
       setTileCollection(newCollection);
       setIsDirty(true);
-      vscode.postMessage({ command: 'dirty_tiles' });
+      vscode.postMessage({ command: 'dirty_tiles', tiles: tileCollection});
    };
 
    const exportTiles = () => {
       vscode.postMessage({ command: 'export_tiles', tiles: tileCollection });
-   }
+   };
 
    useEffect(() => {
 
