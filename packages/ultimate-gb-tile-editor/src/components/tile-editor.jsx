@@ -12,11 +12,16 @@ export function TileEditor({
 
     function updateTileData() {
         const scale = canvasRef.current.width / 8;
+    
         const x = Math.floor(mouseState.x / scale);
         const y = Math.floor(mouseState.y / scale);
         const index = y * 8 + x;
-        let newTileData = [...tileData];
-        newTileData[index] = mouseState.leftClick ? leftCursorColor : mouseState.rightClick ? rightCursorColor : tileData[index];
+        let newTileData = [];
+        if (tileData) { newTileData = [...tileData]; } else {
+            newTileData = new Array(64).fill(0);
+        }
+        newTileData[index] = mouseState.leftClick ? leftCursorColor : mouseState.rightClick ? rightCursorColor : newTileData[index];
+       
         ontileDataChange(newTileData);
     }
 
@@ -32,7 +37,7 @@ export function TileEditor({
     const canvas_onMouseDown = (e) => {
         if (e.button === 0) {
             setMouseState({ ...mouseState, leftClick: true });
-            
+
         } else if (e.button === 2) {
             setMouseState({ ...mouseState, rightClick: true });
         }
@@ -50,7 +55,7 @@ export function TileEditor({
         if (canvasRef && canvasRef.current) {
             const ctx = canvasRef.current.getContext("2d");
 
-            if (ctx) {
+            if (ctx && tileData && tileData.length) {
 
                 ctx.fillStyle = "black";
                 ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
@@ -98,5 +103,5 @@ export function TileEditor({
         </div>
     );
 
- 
+
 };

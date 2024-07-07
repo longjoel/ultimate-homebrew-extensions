@@ -8,18 +8,20 @@ import { TilesPreview } from './components/tiles-preview';
 
 const App = () => {
 
-   const [tileCollection, setTileCollection] = React.useState([new Array(256).fill(new Array(64).fill(0))]);
+   const [tileCollection, setTileCollection] = React.useState([new Array(256).fill(new Array(64).fill(0).map(()=>0))]);
 
    const [currentTileIndex, setCurrentTileIndex] = React.useState(0);
 
-   const [tileData, setTileData] = React.useState(tileCollection[currentTileIndex]);
+   const [tileData, setTileData] = React.useState(new Array(64).fill(0).map(()=>0));
    const [leftColor, setLeftColor] = React.useState(1);
    const [rightColor, setRightColor] = React.useState(0);
 
    const switchTile = (index) => {
       // update list with current title
       let newTileCollection = [...tileCollection];
-      newTileCollection[currentTileIndex] = tileData;
+      let localTileData = tileData;
+      if(!localTileData || !localTileData.length) {localTileData = new Array(64).fill(0).map(()=>0);}
+      newTileCollection[currentTileIndex] = localTileData;
       setTileCollection(newTileCollection);
       // update current tile index
       setCurrentTileIndex(index);

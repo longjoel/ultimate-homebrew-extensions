@@ -4291,8 +4291,13 @@
 	    const x = Math.floor(mouseState.x / scale);
 	    const y = Math.floor(mouseState.y / scale);
 	    const index = y * 8 + x;
-	    let newTileData = [...tileData];
-	    newTileData[index] = mouseState.leftClick ? leftCursorColor : mouseState.rightClick ? rightCursorColor : tileData[index];
+	    let newTileData = [];
+	    if (tileData) {
+	      newTileData = [...tileData];
+	    } else {
+	      newTileData = new Array(64).fill(0);
+	    }
+	    newTileData[index] = mouseState.leftClick ? leftCursorColor : mouseState.rightClick ? rightCursorColor : newTileData[index];
 	    ontileDataChange(newTileData);
 	  }
 	  const canvas_onMouseMove = e => {
@@ -4337,7 +4342,7 @@
 	  const renderCanvas = () => {
 	    if (canvasRef && canvasRef.current) {
 	      const ctx = canvasRef.current.getContext("2d");
-	      if (ctx) {
+	      if (ctx && tileData && tileData.length) {
 	        ctx.fillStyle = "black";
 	        ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 	        const scale = canvasRef.current.width / 8;
@@ -4521,6 +4526,20 @@
 	  ontileChange
 	}) {
 	  const canvasRef = React.useRef();
+	  const onPreviewClick = event => {
+	    const canvas = canvasRef.current;
+	    const scaleWidth = canvas.width / 8;
+	    const scaleHeight = canvas.height / 32;
+	    var rect = canvasRef.current.getBoundingClientRect();
+	    var newMouseState = {
+	      x: event.clientX - rect.left,
+	      y: event.clientY - rect.top
+	    };
+	    const x = Math.floor(newMouseState.x / scaleWidth);
+	    const y = Math.floor(newMouseState.y / scaleHeight);
+	    const index = y * 8 + x;
+	    ontileChange(index);
+	  };
 	  reactExports.useEffect(() => {
 	    const canvas = canvasRef.current;
 	    const scaleWidth = canvas.width / 8;
@@ -4538,7 +4557,7 @@
 	            for (let y = 0; y < 8; y++) {
 	              for (let x = 0; x < 8; x++) {
 	                const tile = tileCollection[i];
-	                if (!tile) {
+	                if (!tile || !tile.length) {
 	                  continue;
 	                }
 	                const color = tile[y * 8 + x];
@@ -4552,27 +4571,30 @@
 	            }
 	          }
 	        }
-	        ctx.strokeStyle = "red";
-	        ctx.strokeRect(0, currentTileIndex * scaleHeight, scaleWidth, scaleHeight);
 	      }
 	    }
 	  }, [tileCollection, currentTileIndex]);
 	  return React.createElement("div", null, React.createElement("canvas", {
-	    width: 8 * 16,
-	    height: 32 * 16,
-	    ref: canvasRef
+	    width: 8 * 32,
+	    height: 32 * 32,
+	    ref: canvasRef,
+	    onClick: onPreviewClick
 	  }));
 	}
 
 	const App = () => {
-	  const [tileCollection, setTileCollection] = React.useState([new Array(256).fill(new Array(64).fill(0))]);
+	  const [tileCollection, setTileCollection] = React.useState([new Array(256).fill(new Array(64).fill(0).map(() => 0))]);
 	  const [currentTileIndex, setCurrentTileIndex] = React.useState(0);
-	  const [tileData, setTileData] = React.useState(tileCollection[currentTileIndex]);
+	  const [tileData, setTileData] = React.useState(new Array(64).fill(0).map(() => 0));
 	  const [leftColor, setLeftColor] = React.useState(1);
 	  const [rightColor, setRightColor] = React.useState(0);
 	  const switchTile = index => {
 	    let newTileCollection = [...tileCollection];
-	    newTileCollection[currentTileIndex] = tileData;
+	    let localTileData = tileData;
+	    if (!localTileData || !localTileData.length) {
+	      localTileData = new Array(64).fill(0).map(() => 0);
+	    }
+	    newTileCollection[currentTileIndex] = localTileData;
 	    setTileCollection(newTileCollection);
 	    setCurrentTileIndex(index);
 	    setTileData(tileCollection[index]);

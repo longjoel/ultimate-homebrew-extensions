@@ -6,7 +6,23 @@ export function TilesPreview({
     ontileChange
 }) {
 
+  
     const canvasRef = React.useRef();
+
+    const onPreviewClick = (event) => {
+
+        const canvas = canvasRef.current;
+        const scaleWidth = canvas.width / 8;
+        const scaleHeight = canvas.height / 32;
+        var rect = canvasRef.current.getBoundingClientRect();
+        var newMouseState = {  x: event.clientX - rect.left, y: event.clientY - rect.top };
+
+        const x = Math.floor(newMouseState.x / scaleWidth);
+        const y = Math.floor(newMouseState.y / scaleHeight);
+        const index = y * 8 + x;
+        ontileChange(index);
+    };
+
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -28,7 +44,7 @@ export function TilesPreview({
                         for (let y = 0; y < 8; y++) {
                             for (let x = 0; x < 8; x++) {
                                 const tile = tileCollection[i];
-                                if (!tile) {
+                                if (!tile || !tile.length) {
                                     continue;
                                 }
                                 const color = tile[y * 8 + x];
@@ -46,8 +62,7 @@ export function TilesPreview({
 
 
                 }
-                ctx.strokeStyle = "red";
-                ctx.strokeRect(0, currentTileIndex * scaleHeight, scaleWidth, scaleHeight);
+            
             }
 
         }
@@ -56,6 +71,6 @@ export function TilesPreview({
     }, [tileCollection, currentTileIndex]);
 
     return <div>
-        <canvas width={8 * 16} height={32 * 16} ref={canvasRef} ></canvas>
+        <canvas width={8 * 32} height={32 * 32} ref={canvasRef} onClick={onPreviewClick}></canvas>
     </div>;
 }
