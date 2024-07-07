@@ -84,6 +84,21 @@ export const TileCommands = ({ tileData, setTileData }) => {
         setTileData(newTileData);
     };
 
+    const copyTile = () => {
+        navigator.clipboard.writeText(JSON.stringify(tileData));
+    };
+
+    const pasteTile = () => {
+        navigator.clipboard.readText().then(text => {
+            try {
+                let newTileData = JSON.parse(text);
+                setTileData(newTileData);
+            } catch (e) {
+                console.error(e);
+            }
+        });
+    };
+
     const buttonStyle = { width: '50%' };
     return <div>
         <button style={{ width: '100%' }} onClick={clearTiles}>Clear</button>
@@ -94,6 +109,8 @@ export const TileCommands = ({ tileData, setTileData }) => {
         <button style={buttonStyle} onClick={flipTilesHorizontal}>Flip Horizontal</button>
         <button style={buttonStyle} onClick={flipTilesVertical}>Flip Vertical</button>
         <button style={buttonStyle} onClick={rotateCW}>Rotate CW</button>
-        <br />
+        <hr/>
+        <button style={buttonStyle} onClick={copyTile}>Copy Tile</button>
+        <button style={buttonStyle} onClick={pasteTile}>Paste Tile</button>
     </div>;
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 
 import { TileEditor } from './components/tile-editor';
@@ -6,13 +6,24 @@ import { TileColorPicker } from './components/tile-color-picker';
 import { TileCommands } from './components/tile-commands';
 import { TilesPreview } from './components/tiles-preview';
 
+if (!acquireVsCodeApi) {
+   var acquireVsCodeApi = function () {
+      return {
+         postMessage: function (message) { }
+      };
+   };
+}
+
+const vscode = acquireVsCodeApi();
+
+
 const App = () => {
 
-   const [tileCollection, setTileCollection] = React.useState([new Array(256).fill(new Array(64).fill(0).map(()=>0))]);
+   const [tileCollection, setTileCollection] = React.useState([...new Array(256).fill(new Array(64).fill(0).map(() => 0))]);
 
    const [currentTileIndex, setCurrentTileIndex] = React.useState(0);
 
-   const [tileData, setTileData] = React.useState(new Array(64).fill(0).map(()=>0));
+   const [tileData, setTileData] = React.useState(new Array(64).fill(0).map(() => 0));
    const [leftColor, setLeftColor] = React.useState(1);
    const [rightColor, setRightColor] = React.useState(0);
 
@@ -20,7 +31,7 @@ const App = () => {
       // update list with current title
       let newTileCollection = [...tileCollection];
       let localTileData = tileData;
-      if(!localTileData || !localTileData.length) {localTileData = new Array(64).fill(0).map(()=>0);}
+      if (!localTileData || !localTileData.length) { localTileData = new Array(64).fill(0).map(() => 0); }
       newTileCollection[currentTileIndex] = localTileData;
       setTileCollection(newTileCollection);
       // update current tile index
@@ -36,6 +47,28 @@ const App = () => {
       setTileCollection(newCollection);
    };
 
+   useEffect(() => {
+
+      window.addEventListener('message', (event) => {
+
+         const message = event.data; // The JSON data our extension sent
+
+         switch (message.command) {
+            case 'load_tiles':
+               setTileCollection(message.tiles);
+               break;
+            case 'save_tiles':
+               vscode.postMessage({ command: 'save_tiles', tiles: tileCollection });
+               break;
+         }
+      });
+
+      return () => {
+         window.removeEventListener('message', (event) => { });
+
+      };
+   });
+
    return (
       <div className='fluid-container'>
          <div className='row' >
@@ -44,7 +77,7 @@ const App = () => {
                <TileColorPicker leftColor={leftColor} rightColor={rightColor} setLeftColor={setLeftColor} setRightColor={setRightColor} />
 
             </div>
-            <div className='col-4' >
+            <div className='col-5' >
 
                <TileEditor
                   tileData={tileData}

@@ -8,11 +8,42 @@ export function TileEditor({
 }) {
 
     const canvasRef = useRef();
-    const [mouseState, setMouseState] = React.useState({ x: 0, y: 0, leftClick: false, rightClick: false });
+    const [mouseState, setMouseState] = React.useState(
+        { x: 0, y: 0, leftClick: false, rightClick: false });
 
-    function updateTileData() {
+    const canvas_onMouseMove = (e) => {
+        var rect = canvasRef.current.getBoundingClientRect();
+        var newMouseState = { ...mouseState, x: e.clientX - rect.left, y: e.clientY - rect.top };
+
+
+        setMouseState(newMouseState);
+    };
+    const canvas_onMouseDown = (e) => {
+        let newMouseState = { ...mouseState };
+        if (e.button === 0) {
+            newMouseState.leftClick = true;
+
+        } else if (e.button === 2) {
+            newMouseState.rightClick = true;
+        }
+
+        setMouseState(newMouseState);
+    };
+    const canvas_onMouseUp = (e) => {
+        let newMouseState = { ...mouseState };
+        if (e.button === 0) {
+            newMouseState.leftClick = false;
+
+        } else if (e.button === 2) {
+            newMouseState.rightClick = false;
+        }
+        setMouseState(newMouseState);
+
+    };
+
+    useEffect(() => {
         const scale = canvasRef.current.width / 8;
-    
+
         const x = Math.floor(mouseState.x / scale);
         const y = Math.floor(mouseState.y / scale);
         const index = y * 8 + x;
@@ -21,37 +52,11 @@ export function TileEditor({
             newTileData = new Array(64).fill(0);
         }
         newTileData[index] = mouseState.leftClick ? leftCursorColor : mouseState.rightClick ? rightCursorColor : newTileData[index];
-       
+
         ontileDataChange(newTileData);
-    }
+    }, [mouseState]);
 
-    const canvas_onMouseMove = (e) => {
-        var rect = canvasRef.current.getBoundingClientRect();
-        var newMouseState = { ...mouseState, x: e.clientX - rect.left, y: e.clientY - rect.top };
-        if (mouseState.leftClick || mouseState.rightClick) {
-            updateTileData();
-        }
-
-        setMouseState(newMouseState);
-    };
-    const canvas_onMouseDown = (e) => {
-        if (e.button === 0) {
-            setMouseState({ ...mouseState, leftClick: true });
-
-        } else if (e.button === 2) {
-            setMouseState({ ...mouseState, rightClick: true });
-        }
-        updateTileData();
-    };
-    const canvas_onMouseUp = (e) => {
-        if (e.button === 0) {
-            setMouseState({ ...mouseState, leftClick: false });
-        } else if (e.button === 2) {
-            setMouseState({ ...mouseState, rightClick: false });
-        }
-
-    };
-    const renderCanvas = () => {
+    useEffect(() => {
         if (canvasRef && canvasRef.current) {
             const ctx = canvasRef.current.getContext("2d");
 
@@ -84,11 +89,7 @@ export function TileEditor({
             }
         }
 
-    };
-
-    useEffect(() => {
-        renderCanvas();
-    }, [tileData, leftCursorColor, rightCursorColor, mouseState]);
+    }, [tileData,mouseState]);
 
     return (
         <div>

@@ -4286,7 +4286,38 @@
 	    leftClick: false,
 	    rightClick: false
 	  });
-	  function updateTileData() {
+	  const canvas_onMouseMove = e => {
+	    var rect = canvasRef.current.getBoundingClientRect();
+	    var newMouseState = {
+	      ...mouseState,
+	      x: e.clientX - rect.left,
+	      y: e.clientY - rect.top
+	    };
+	    setMouseState(newMouseState);
+	  };
+	  const canvas_onMouseDown = e => {
+	    let newMouseState = {
+	      ...mouseState
+	    };
+	    if (e.button === 0) {
+	      newMouseState.leftClick = true;
+	    } else if (e.button === 2) {
+	      newMouseState.rightClick = true;
+	    }
+	    setMouseState(newMouseState);
+	  };
+	  const canvas_onMouseUp = e => {
+	    let newMouseState = {
+	      ...mouseState
+	    };
+	    if (e.button === 0) {
+	      newMouseState.leftClick = false;
+	    } else if (e.button === 2) {
+	      newMouseState.rightClick = false;
+	    }
+	    setMouseState(newMouseState);
+	  };
+	  reactExports.useEffect(() => {
 	    const scale = canvasRef.current.width / 8;
 	    const x = Math.floor(mouseState.x / scale);
 	    const y = Math.floor(mouseState.y / scale);
@@ -4299,47 +4330,8 @@
 	    }
 	    newTileData[index] = mouseState.leftClick ? leftCursorColor : mouseState.rightClick ? rightCursorColor : newTileData[index];
 	    ontileDataChange(newTileData);
-	  }
-	  const canvas_onMouseMove = e => {
-	    var rect = canvasRef.current.getBoundingClientRect();
-	    var newMouseState = {
-	      ...mouseState,
-	      x: e.clientX - rect.left,
-	      y: e.clientY - rect.top
-	    };
-	    if (mouseState.leftClick || mouseState.rightClick) {
-	      updateTileData();
-	    }
-	    setMouseState(newMouseState);
-	  };
-	  const canvas_onMouseDown = e => {
-	    if (e.button === 0) {
-	      setMouseState({
-	        ...mouseState,
-	        leftClick: true
-	      });
-	    } else if (e.button === 2) {
-	      setMouseState({
-	        ...mouseState,
-	        rightClick: true
-	      });
-	    }
-	    updateTileData();
-	  };
-	  const canvas_onMouseUp = e => {
-	    if (e.button === 0) {
-	      setMouseState({
-	        ...mouseState,
-	        leftClick: false
-	      });
-	    } else if (e.button === 2) {
-	      setMouseState({
-	        ...mouseState,
-	        rightClick: false
-	      });
-	    }
-	  };
-	  const renderCanvas = () => {
+	  }, [mouseState]);
+	  reactExports.useEffect(() => {
 	    if (canvasRef && canvasRef.current) {
 	      const ctx = canvasRef.current.getContext("2d");
 	      if (ctx && tileData && tileData.length) {
@@ -4367,10 +4359,7 @@
 	        }
 	      }
 	    }
-	  };
-	  reactExports.useEffect(() => {
-	    renderCanvas();
-	  }, [tileData, leftCursorColor, rightCursorColor, mouseState]);
+	  }, [tileData, mouseState]);
 	  return React.createElement("div", null, React.createElement("canvas", {
 	    onContextMenu: e => {
 	      e.preventDefault();
@@ -4488,6 +4477,19 @@
 	    }
 	    setTileData(newTileData);
 	  };
+	  const copyTile = () => {
+	    navigator.clipboard.writeText(JSON.stringify(tileData));
+	  };
+	  const pasteTile = () => {
+	    navigator.clipboard.readText().then(text => {
+	      try {
+	        let newTileData = JSON.parse(text);
+	        setTileData(newTileData);
+	      } catch (e) {
+	        console.error(e);
+	      }
+	    });
+	  };
 	  const buttonStyle = {
 	    width: '50%'
 	  };
@@ -4517,7 +4519,13 @@
 	  }, "Flip Vertical"), React.createElement("button", {
 	    style: buttonStyle,
 	    onClick: rotateCW
-	  }, "Rotate CW"), React.createElement("br", null));
+	  }, "Rotate CW"), React.createElement("hr", null), React.createElement("button", {
+	    style: buttonStyle,
+	    onClick: copyTile
+	  }, "Copy Tile"), React.createElement("button", {
+	    style: buttonStyle,
+	    onClick: pasteTile
+	  }, "Paste Tile"));
 	};
 
 	function TilesPreview({
@@ -4582,8 +4590,16 @@
 	  }));
 	}
 
+	if (!acquireVsCodeApi) {
+	  var acquireVsCodeApi = function () {
+	    return {
+	      postMessage: function (message) {}
+	    };
+	  };
+	}
+	const vscode = acquireVsCodeApi();
 	const App = () => {
-	  const [tileCollection, setTileCollection] = React.useState([new Array(256).fill(new Array(64).fill(0).map(() => 0))]);
+	  const [tileCollection, setTileCollection] = React.useState([...new Array(256).fill(new Array(64).fill(0).map(() => 0))]);
 	  const [currentTileIndex, setCurrentTileIndex] = React.useState(0);
 	  const [tileData, setTileData] = React.useState(new Array(64).fill(0).map(() => 0));
 	  const [leftColor, setLeftColor] = React.useState(1);
@@ -4605,6 +4621,25 @@
 	    newCollection[currentTileIndex] = data;
 	    setTileCollection(newCollection);
 	  };
+	  reactExports.useEffect(() => {
+	    window.addEventListener('message', event => {
+	      const message = event.data;
+	      switch (message.command) {
+	        case 'load_tiles':
+	          setTileCollection(message.tiles);
+	          break;
+	        case 'save_tiles':
+	          vscode.postMessage({
+	            command: 'save_tiles',
+	            tiles: tileCollection
+	          });
+	          break;
+	      }
+	    });
+	    return () => {
+	      window.removeEventListener('message', event => {});
+	    };
+	  });
 	  return React.createElement("div", {
 	    className: "fluid-container"
 	  }, React.createElement("div", {
@@ -4620,7 +4655,7 @@
 	    setLeftColor: setLeftColor,
 	    setRightColor: setRightColor
 	  })), React.createElement("div", {
-	    className: "col-4"
+	    className: "col-5"
 	  }, React.createElement(TileEditor, {
 	    tileData: tileData,
 	    ontileDataChange: updateTileData,
