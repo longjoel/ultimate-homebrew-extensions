@@ -46,24 +46,8 @@ export class GameboyTileDesignerDocument implements vscode.CustomDocument {
     constructor(uri: vscode.Uri, tileData: number[][]) {
         this.uri = uri;
         this.tileData = tileData;
-this.uniqueId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        this.uniqueId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
-    }
-    get viewType(): string {
-        return 'gameboy-tile-designer';
-    }
-    get content() {
-        return JSON.stringify(this.tileData);
-    }
-    get version() {
-        return { version: 1, isCurrentVersion: true };
-    }
-    async save(cancellation: vscode.CancellationToken): Promise<void> {
-
-        this.isDirty = false;
-    }
-    async saveAs(targetResource: vscode.Uri, cancellation: vscode.CancellationToken): Promise<void> {
-        this.isDirty = false;
     }
 
 
@@ -115,19 +99,26 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
 
     saveCustomDocument(document: GameboyTileDesignerDocument, cancellation: vscode.CancellationToken): Thenable<void> {
 
-        console.log("Save Custom Document", document.uniqueId, crc32(JSON.stringify(document.tileData)));
-        document.isDirty = false;
-        const data = new TextEncoder().encode(document.tileData.map((tile) => `${tile.join(',')}`).join('\n'));
-        vscode.workspace.fs.writeFile(document.uri, data);
-        return Promise.resolve();
+        return new Promise((resolve, reject) => {
+            console.log("Save Custom Document", document.uniqueId, crc32(JSON.stringify(document.tileData)));
+            document.isDirty = false;
+            const data = new TextEncoder().encode(document.tileData.map((tile) => `${tile.join(',')}`).join('\n'));
+            vscode.workspace.fs.writeFile(document.uri, data).then(() => {
+                resolve();
+            });
+        });
     }
     saveCustomDocumentAs(document: GameboyTileDesignerDocument, destination: vscode.Uri, cancellation: vscode.CancellationToken): Thenable<void> {
 
-        console.log("Save Custom Document As", document.uniqueId, crc32(JSON.stringify(document.tileData)));
-        document.isDirty = false;
-        const data = new TextEncoder().encode(document.tileData.map((tile) => `${tile.join(',')}`).join('\n'));
-        vscode.workspace.fs.writeFile(destination, data);
-        return Promise.resolve();
+        return new Promise((resolve, reject) => {
+            console.log("Save Custom Document As", document.uniqueId, crc32(JSON.stringify(document.tileData)));
+            document.isDirty = false;
+            const data = new TextEncoder().encode(document.tileData.map((tile) => `${tile.join(',')}`).join('\n'));
+            vscode.workspace.fs.writeFile(destination, data).then(() => {
+                resolve();
+            });
+        });
+
     }
     revertCustomDocument(document: GameboyTileDesignerDocument, cancellation: vscode.CancellationToken): Thenable<void> {
 
@@ -164,53 +155,52 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
                 console.log("Save Tiles", document.uniqueId, crc32(JSON.stringify(document.tileData)));
                 this.saveCustomDocument(document, token);
             }
+            if (msg.command === 'dirty_tiles') {
+                document.tileData = msg.tiles;
+                document.isDirty = true;
+                this.onDidChangeCustomDocument((e) => {
+                    e.document.isDirty = true;
+                    e.document.tileData = msg.tiles;
+                });
 
-            // if (msg.command === 'dirty_tiles') {
-            //     document.tileData = msg.tiles;
-            //     document.isDirty = true;
-            //     this.onDidChangeCustomDocument((e) => {
-            //         e.document.isDirty = true;
-            //         e.document.tileData = msg.tiles;
-            //     });
+            }
 
-            // }
         });
 
-        
+
 
         const publicLocation = vscode.Uri.joinPath(this.context.extensionUri, 'packages', 'ultimate-gb-tile-editor', 'public');
         vscode.workspace.fs.readFile(vscode.Uri.joinPath(publicLocation, 'index.html')).then((html) => {
 
             vscode.workspace.fs.readFile(vscode.Uri.joinPath(publicLocation, 'index.js')).then((js) => {
                 webviewPanel.webview.html = html.toString().split('<script src="index.js"></script>').join(`<script src="${webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(publicLocation, 'index.js'))}"></script>`);
-                setTimeout(() => {
                 webviewPanel.webview.postMessage({ command: 'set_tiles', tiles: document.tileData });
-                    
-                }, 1000);
                 //
             });
         });
+
+        webviewPanel.webview.postMessage({ command: 'set_tiles', tiles: document.tileData });
 
     }
 
 
 
 }
-    function crc32(stringToHash: string): string {
-        const table = new Uint32Array(256);
-        for (let i = 0; i < 256; i++) {
-            let c = i;
-            for (let j = 0; j < 8; j++) {
-                c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
-            }
-            table[i] = c;
+function crc32(stringToHash: string): string {
+    const table = new Uint32Array(256);
+    for (let i = 0; i < 256; i++) {
+        let c = i;
+        for (let j = 0; j < 8; j++) {
+            c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
         }
-
-        let crc = 0xFFFFFFFF;
-        for (let i = 0; i < stringToHash.length; i++) {
-            crc = (crc >>> 8) ^ table[(crc ^ stringToHash.charCodeAt(i)) & 0xFF];
-        }
-        crc ^= 0xFFFFFFFF;
-
-        return crc.toString(16).toUpperCase();
+        table[i] = c;
     }
+
+    let crc = 0xFFFFFFFF;
+    for (let i = 0; i < stringToHash.length; i++) {
+        crc = (crc >>> 8) ^ table[(crc ^ stringToHash.charCodeAt(i)) & 0xFF];
+    }
+    crc ^= 0xFFFFFFFF;
+
+    return crc.toString(16).toUpperCase();
+}
