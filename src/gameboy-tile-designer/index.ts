@@ -174,10 +174,7 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
 
             vscode.workspace.fs.readFile(vscode.Uri.joinPath(publicLocation, 'index.js')).then((js) => {
                 webviewPanel.webview.html = html.toString().split('<script src="index.js"></script>').join(`<script src="${webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(publicLocation, 'index.js'))}"></script>`);
-                console.log('setting tiles', document.tileData);
-                webviewPanel.webview.postMessage({ command: 'set_tiles', tiles: document.tileData }).then(result=>{
-                    console.log('result of post message', result);
-                });
+                webviewPanel.webview.postMessage({ command: 'set_tiles', tiles: document.tileData });
                 //
             });
         });

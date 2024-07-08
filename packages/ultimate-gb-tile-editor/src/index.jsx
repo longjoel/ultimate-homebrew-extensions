@@ -14,7 +14,7 @@ if (!acquireVsCodeApi) {
    };
 }
 
-const vscode = acquireVsCodeApi();
+const vscode = window.acquireVsCodeApi();
 
 
 const App = () => {
@@ -61,6 +61,7 @@ const App = () => {
          const message = event.data; // The JSON data our extension sent
          switch (message.command) {
             case 'set_tiles':
+               debugger;
                setTileCollection(message.tiles);
                setTileData(message.tiles[0]);
                setCurrentTileIndex(0);
@@ -69,10 +70,8 @@ const App = () => {
          }
       };
 
-      console.log('adding event listener');
       window.addEventListener('message', eventListener);
       return () => {
-         console.log('removing event listener.');
          window.removeEventListener('message',eventListener);
 
       };
