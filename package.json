@@ -3,7 +3,7 @@
   "displayName": "ultimate-homebrew-extensions",
   "publisher": "JoelLonganecker",
   "description": "",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "engines": {
     "vscode": "^1.90.0"
   },

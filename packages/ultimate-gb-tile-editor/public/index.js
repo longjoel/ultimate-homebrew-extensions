@@ -4596,7 +4596,14 @@
 	  }));
 	}
 
-	const vscode = window.acquireVsCodeApi();
+	if (!acquireVsCodeApi) {
+	  var acquireVsCodeApi = function () {
+	    return {
+	      postMessage: function (message) {}
+	    };
+	  };
+	}
+	const vscode = acquireVsCodeApi();
 	const App = () => {
 	  const [tileCollection, setTileCollection] = React.useState([...new Array(256).fill(new Array(64).fill(0).map(() => 0))]);
 	  const [currentTileIndex, setCurrentTileIndex] = React.useState(0);
@@ -4637,7 +4644,6 @@
 	      const message = event.data;
 	      switch (message.command) {
 	        case 'set_tiles':
-	          debugger;
 	          setTileCollection(message.tiles);
 	          setTileData(message.tiles[0]);
 	          setCurrentTileIndex(0);
@@ -4645,8 +4651,10 @@
 	          break;
 	      }
 	    };
+	    console.log('adding event listener');
 	    window.addEventListener('message', eventListener);
 	    return () => {
+	      console.log('removing event listener.');
 	      window.removeEventListener('message', eventListener);
 	    };
 	  }, []);
