@@ -4633,28 +4633,23 @@
 	    });
 	  };
 	  reactExports.useEffect(() => {
-	    window.addEventListener('message', event => {
+	    const eventListener = event => {
 	      const message = event.data;
-	      console.log('message', message);
 	      switch (message.command) {
 	        case 'set_tiles':
+	          debugger;
 	          setTileCollection(message.tiles);
-	          console.log('setting tiles');
-	          break;
-	        case 'save_tiles':
-	          vscode.postMessage({
-	            command: 'save_tiles',
-	            tiles: tileCollection
-	          });
-	          console.log('saving tiles');
-	          setIsDirty(false);
+	          setTileData(message.tiles[0]);
+	          setCurrentTileIndex(0);
+	          console.log('setting tiles', message.tiles[0]);
 	          break;
 	      }
-	    });
-	    return () => {
-	      window.removeEventListener('message', event => {});
 	    };
-	  });
+	    window.addEventListener('message', eventListener);
+	    return () => {
+	      window.removeEventListener('message', eventListener);
+	    };
+	  }, []);
 	  return React.createElement("div", {
 	    className: "fluid-container"
 	  }, React.createElement("div", {
@@ -4687,6 +4682,8 @@
 	    }
 	  }))));
 	};
-	client.createRoot(document.querySelector('#app')).render( React.createElement(App));
+	client.createRoot(document.querySelector('#app')).render( React.createElement(App, {
+	  initialData: []
+	}));
 
 })();

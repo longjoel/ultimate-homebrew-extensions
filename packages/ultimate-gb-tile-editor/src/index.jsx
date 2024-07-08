@@ -57,28 +57,25 @@ const App = () => {
 
    useEffect(() => {
 
-      window.addEventListener('message', (event) => {
-
+      const eventListener = (event)=>{
          const message = event.data; // The JSON data our extension sent
-console.log('message', message);
          switch (message.command) {
             case 'set_tiles':
+               debugger;
                setTileCollection(message.tiles);
-               console.log('setting tiles');
-               break;
-            case 'save_tiles':
-               vscode.postMessage({ command: 'save_tiles', tiles: tileCollection });
-               console.log('saving tiles');
-               setIsDirty(false);
+               setTileData(message.tiles[0]);
+               setCurrentTileIndex(0);
+               console.log('setting tiles', message.tiles[0]);
                break;
          }
-      });
+      };
 
+      window.addEventListener('message', eventListener);
       return () => {
-         window.removeEventListener('message', (event) => { });
+         window.removeEventListener('message',eventListener);
 
       };
-   });
+},[]);
 
    return (
       <div className='fluid-container'>
@@ -112,5 +109,4 @@ console.log('message', message);
 
 };
 
-ReactDOM.createRoot(document.querySelector('#app')).render(
-   React.createElement(App));
+ReactDOM.createRoot(document.querySelector('#app')).render(<App initialData={[]}/>);
