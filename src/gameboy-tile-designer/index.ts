@@ -152,7 +152,6 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
             }
             if (msg.command === 'save_tiles') {
                 document.tileData = msg.tiles;
-                console.log("Save Tiles", document.uniqueId, crc32(JSON.stringify(document.tileData)));
                 this.saveCustomDocument(document, token);
             }
             if (msg.command === 'dirty_tiles') {
@@ -173,16 +172,18 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
         vscode.workspace.fs.readFile(vscode.Uri.joinPath(publicLocation, 'index.html')).then((html) => {
 
             vscode.workspace.fs.readFile(vscode.Uri.joinPath(publicLocation, 'index.js')).then((js) => {
-                webviewPanel.webview.html = html.toString().split('<script src="index.js"></script>').join(`<script src="${webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(publicLocation, 'index.js'))}"></script>`);
-                console.log('setting tiles', document.tileData);
-                webviewPanel.webview.postMessage({ command: 'set_tiles', tiles: document.tileData }).then(result=>{
-                    console.log('result of post message', result);
-                });
-                //
+                webviewPanel.webview.html = html.toString()
+                .split('<div id="tile-data" data-tiles=""></div>')
+                .join(`<div id="tile-data" data-tiles="${JSON.stringify(document.tileData)}"></div>`)
+                .split('<script src="index.js"></script>')
+                .join(`<script src="${webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(publicLocation, 'index.js'))}"></script>`);
+
+                // webviewPanel.webview.postMessage({ command: 'set_tiles', tiles: document.tileData }).then(result=>{
+
+                // });
+                
             });
         });
-
-        webviewPanel.webview.postMessage({ command: 'set_tiles', tiles: document.tileData });
 
     }
 

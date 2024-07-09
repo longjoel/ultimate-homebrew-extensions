@@ -4596,38 +4596,27 @@
 	  }));
 	}
 
-	if (!acquireVsCodeApi) {
-	  var acquireVsCodeApi = function () {
-	    return {
-	      postMessage: function (message) {}
-	    };
-	  };
-	}
 	const vscode = acquireVsCodeApi();
-	const App = () => {
-	  const [tileCollection, setTileCollection] = React.useState([...new Array(256).fill(new Array(64).fill(0).map(() => 0))]);
+	const App = ({
+	  initialData
+	}) => {
+	  const [tileCollection, setTileCollection] = React.useState([...initialData]);
 	  const [currentTileIndex, setCurrentTileIndex] = React.useState(0);
-	  const [tileData, setTileData] = React.useState(new Array(64).fill(0).map(() => 0));
+	  const [tileData, setTileData] = React.useState(initialData[0]);
 	  const [leftColor, setLeftColor] = React.useState(1);
 	  const [rightColor, setRightColor] = React.useState(0);
-	  const [isDirty, setIsDirty] = React.useState(false);
 	  const switchTile = index => {
 	    let newTileCollection = [...tileCollection];
-	    let localTileData = tileData;
-	    if (!localTileData || !localTileData.length) {
-	      localTileData = new Array(64).fill(0).map(() => 0);
-	    }
-	    newTileCollection[currentTileIndex] = localTileData;
+	    newTileCollection[currentTileIndex] = tileData;
 	    setTileCollection(newTileCollection);
 	    setCurrentTileIndex(index);
-	    setTileData(tileCollection[index]);
+	    setTileData(newTileCollection[index]);
 	  };
 	  const updateTileData = data => {
 	    setTileData(data);
 	    const newCollection = [...tileCollection];
 	    newCollection[currentTileIndex] = data;
 	    setTileCollection(newCollection);
-	    setIsDirty(true);
 	    vscode.postMessage({
 	      command: 'dirty_tiles',
 	      tiles: tileCollection
@@ -4639,25 +4628,6 @@
 	      tiles: tileCollection
 	    });
 	  };
-	  reactExports.useEffect(() => {
-	    const eventListener = event => {
-	      const message = event.data;
-	      switch (message.command) {
-	        case 'set_tiles':
-	          setTileCollection(message.tiles);
-	          setTileData(message.tiles[0]);
-	          setCurrentTileIndex(0);
-	          console.log('setting tiles', message.tiles[0]);
-	          break;
-	      }
-	    };
-	    console.log('adding event listener');
-	    window.addEventListener('message', eventListener);
-	    return () => {
-	      console.log('removing event listener.');
-	      window.removeEventListener('message', eventListener);
-	    };
-	  }, []);
 	  return React.createElement("div", {
 	    className: "fluid-container"
 	  }, React.createElement("div", {
@@ -4690,8 +4660,12 @@
 	    }
 	  }))));
 	};
+	let data = document.querySelector('#tile-data').getAttribute('data-tiles');
+	if (!data) {
+	  data = new Array(256).fill(new Array(64).fill(0));
+	}
 	client.createRoot(document.querySelector('#app')).render( React.createElement(App, {
-	  initialData: []
+	  initialData: JSON.parse(data)
 	}));
 
 })();
