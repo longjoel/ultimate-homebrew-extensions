@@ -145,7 +145,7 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
                 vscode.window.showSaveDialog({ saveLabel: 'Export C File', defaultUri: vscode.Uri.from({ scheme: document.uri.scheme, path: newURI }), title: 'Export C File' })
                     .then((uri) => {
                         if (uri) {
-                            let cFile = `const unsigned char ${uri.path.split('/').at(-1)?.split('.').at(0)}[256][16] = {${msg.tiles.map((tx: number[]) => pixelsToCByteArray(tx) + "\n")}};`;
+                            let cFile = `const unsigned char ${uri.path.split('/').at(-1)?.split('.').at(0)}[${msg.tiles.length}][16] = {${msg.tiles.map((tx: number[]) => pixelsToCByteArray(tx) + "\n")}};`;
                             vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(cFile));
                         }
                     });
@@ -176,12 +176,8 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
                 .split('<div id="tile-data" data-tiles=""></div>')
                 .join(`<div id="tile-data" data-tiles="${JSON.stringify(document.tileData)}"></div>`)
                 .split('<script src="index.js"></script>')
-                .join(`<script src="${webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(publicLocation, 'index.js'))}"></script>`);
+                .join(`<script src="${webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(publicLocation, 'index.min.js'))}"></script>`);
 
-                // webviewPanel.webview.postMessage({ command: 'set_tiles', tiles: document.tileData }).then(result=>{
-
-                // });
-                
             });
         });
 
