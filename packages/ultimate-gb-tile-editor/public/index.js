@@ -4526,12 +4526,30 @@
 	  }, "Copy Tile"), React.createElement("button", {
 	    style: buttonStyle,
 	    onClick: pasteTile
-	  }, "Paste Tile"), React.createElement("hr", null), React.createElement("button", {
+	  }, "Paste Tile"), React.createElement("hr", null), React.createElement("label", {
+	    htmlFor: "start"
+	  }, "Start"), React.createElement("input", {
+	    type: "number",
+	    id: 'start',
+	    style: {
+	      width: '25%'
+	    },
+	    defaultValue: 0
+	  }), React.createElement("label", {
+	    htmlFor: "start"
+	  }, "End"), React.createElement("input", {
+	    type: "number",
+	    id: 'end',
+	    style: {
+	      width: '25%'
+	    },
+	    defaultValue: 255
+	  }), React.createElement("button", {
 	    style: {
 	      width: '100%'
 	    },
-	    onClick: exportTiles
-	  }, "Export Tiles"));
+	    onClick: () => exportTiles(document.querySelector('#start').value, document.querySelector('#end').value)
+	  }, "Export Tiles"), React.createElement("hr", null));
 	};
 
 	function TilesPreview({
@@ -4600,20 +4618,18 @@
 	const App = ({
 	  initialData
 	}) => {
-	  const [tileCollection, setTileCollection] = React.useState([...initialData]);
+	  let paddedInitialData = new Array(256).fill(new Array(64).fill(0));
+	  initialData.forEach((data, i) => {
+	    paddedInitialData[i] = data;
+	  });
+	  const [tileCollection, setTileCollection] = React.useState(initialData);
 	  const [currentTileIndex, setCurrentTileIndex] = React.useState(0);
-	  const [tileData, setTileData] = React.useState(initialData[0]);
 	  const [leftColor, setLeftColor] = React.useState(1);
 	  const [rightColor, setRightColor] = React.useState(0);
 	  const switchTile = index => {
-	    let newTileCollection = [...tileCollection];
-	    newTileCollection[currentTileIndex] = tileData;
-	    setTileCollection(newTileCollection);
 	    setCurrentTileIndex(index);
-	    setTileData(newTileCollection[index]);
 	  };
 	  const updateTileData = data => {
-	    setTileData(data);
 	    const newCollection = [...tileCollection];
 	    newCollection[currentTileIndex] = data;
 	    setTileCollection(newCollection);
@@ -4622,20 +4638,21 @@
 	      tiles: tileCollection
 	    });
 	  };
-	  const exportTiles = () => {
+	  const exportTiles = (start, end) => {
 	    vscode.postMessage({
 	      command: 'export_tiles',
-	      tiles: tileCollection
+	      tiles: tileCollection.filter((_, i) => i >= start && i <= end)
 	    });
 	  };
-	  return React.createElement("div", {
-	    className: "fluid-container"
-	  }, React.createElement("div", {
-	    className: "row"
-	  }, React.createElement("div", {
-	    className: "col-2"
+	  return React.createElement("div", null, React.createElement("div", null, React.createElement("div", {
+	    style: {
+	      position: 'absolute',
+	      width: '256px',
+	      left: '16px',
+	      top: '16px'
+	    }
 	  }, React.createElement(TileCommands, {
-	    tileData: tileData,
+	    tileData: tileCollection[currentTileIndex],
 	    setTileData: updateTileData,
 	    exportTiles: exportTiles
 	  }), React.createElement(TileColorPicker, {
@@ -4644,14 +4661,24 @@
 	    setLeftColor: setLeftColor,
 	    setRightColor: setRightColor
 	  })), React.createElement("div", {
-	    className: "col-5"
+	    style: {
+	      position: 'absolute',
+	      width: '480px',
+	      left: '288px',
+	      top: '16px'
+	    }
 	  }, React.createElement(TileEditor, {
-	    tileData: tileData,
+	    tileData: tileCollection[currentTileIndex],
 	    ontileDataChange: updateTileData,
 	    leftCursorColor: leftColor,
 	    rightCursorColor: rightColor
 	  })), React.createElement("div", {
-	    className: "col-2"
+	    style: {
+	      position: 'absolute',
+	      width: '256px',
+	      left: '720px',
+	      top: '16px'
+	    }
 	  }, React.createElement(TilesPreview, {
 	    tileCollection: tileCollection,
 	    currentTileIndex: currentTileIndex,

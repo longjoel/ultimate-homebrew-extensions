@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 
 export const TileCommands = ({ tileData, setTileData,exportTiles }) => {
@@ -98,7 +98,6 @@ export const TileCommands = ({ tileData, setTileData,exportTiles }) => {
             }
         });
     };
-
     const buttonStyle = { width: '50%' };
     return <div>
         <button style={{ width: '100%' }} onClick={clearTiles}>Clear</button>
@@ -113,7 +112,13 @@ export const TileCommands = ({ tileData, setTileData,exportTiles }) => {
         <button style={buttonStyle} onClick={copyTile}>Copy Tile</button>
         <button style={buttonStyle} onClick={pasteTile}>Paste Tile</button>
         <hr/>
-        <button style={{ width: '100%' }} onClick={exportTiles}>Export Tiles</button>
+        <label htmlFor='start'>Start</label>
+        <input type='number' id={'start'} style={{width:'25%'}} defaultValue={0}></input>
+        <label htmlFor='start'>End</label>
+        
+        <input type='number' id={'end'} style={{width:'25%'}} defaultValue={255}></input>
+        <button style={{ width: '100%' }} onClick={()=>exportTiles(document.querySelector('#start').value,document.querySelector('#end').value)}>Export Tiles</button>
+        <hr/>
 
     </div>;
 };
