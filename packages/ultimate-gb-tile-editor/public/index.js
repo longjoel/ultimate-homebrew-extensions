@@ -4626,9 +4626,6 @@
 	  const [currentTileIndex, setCurrentTileIndex] = React.useState(0);
 	  const [leftColor, setLeftColor] = React.useState(1);
 	  const [rightColor, setRightColor] = React.useState(0);
-	  const switchTile = index => {
-	    setCurrentTileIndex(index);
-	  };
 	  const updateTileData = data => {
 	    const newCollection = [...tileCollection];
 	    newCollection[currentTileIndex] = data;
@@ -4683,7 +4680,7 @@
 	    tileCollection: tileCollection,
 	    currentTileIndex: currentTileIndex,
 	    ontileChange: index => {
-	      switchTile(index);
+	      setCurrentTileIndex(index);
 	    }
 	  }))));
 	};
