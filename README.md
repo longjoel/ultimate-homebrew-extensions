@@ -1,5 +1,7 @@
 # ultimate-homebrew-extensions
 
+https://marketplace.visualstudio.com/items?itemName=JoelLonganecker.ultimate-homebrew-extensions
+
 ## Features
 
 - Runs an emulator to test ROMs inside of VS Code
