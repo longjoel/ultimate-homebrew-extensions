@@ -72,7 +72,9 @@
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "docker:build-image":"docker build -t 'testcontainer' .",
+    "docker:build-container":"docker run -p 8080:8080 -it 'testcontainer' "
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",
