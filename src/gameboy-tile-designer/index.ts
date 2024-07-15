@@ -1,42 +1,83 @@
 
 import * as vscode from 'vscode';
 
-function binToHex(s: string) {
-    const byteMap: Record<string, string> = {
-        "0000": "0",
-        "0001": "1",
-        "0010": "2",
-        "0011": "3",
-        "0100": "4",
-        "0101": "5",
-        "0110": "6",
-        "0111": "7",
-        "1000": "8",
-        "1001": "9",
-        "1010": "A",
-        "1011": "B",
-        "1100": "C",
-        "1101": "D",
-        "1110": "E",
-        "1111": "F"
-    };
+// const pixelsToCByteArray = (data: number[]) => {
+//     const bitMap: Record<number, string> = { 0: "00", 1: "01", 2: "10", 3: "11" };
+//     let arr = data.map((d) => bitMap[d]);
+//     let outStr = `{${binToHex(arr.join(""))}}`;
+//     return outStr;
+// };
 
-    let parts = [];
-    for (let i = 0; i < s.length; i += 8) {
-        let subStrA = byteMap[s.slice(i, i + 4)];
-        let subStrB = byteMap[s.slice(i + 4, i + 8)];
-        parts.push(`0x${subStrA}${subStrB}`);
+function pixelsToCByteArray(colorIndices: number[]): string {
+    // Determine the number of bytes needed for the output
+    const numBytes = Math.ceil(colorIndices.length * 2 / 8);
+    const byteArray = new Uint8Array(numBytes);
+
+    // Iterate through the color indices
+    for (let i = 0; i < colorIndices.length; i++) {
+        // Calculate the position within the byte array
+        const byteIndex = Math.floor(i * 2 / 8);
+        const bitOffset = (i * 2) % 8;
+
+        // Pack two color indices into one byte
+        if (bitOffset === 0) {
+            byteArray[byteIndex] = colorIndices[i];
+        } else {
+            byteArray[byteIndex] |= (colorIndices[i] << bitOffset);
+        }
     }
 
-    return parts.join(", ");
+    // Convert byteArray to hexadecimal string array
+    const hexArray = Array.from(byteArray, byte => '0x' + byte.toString(16).padStart(2, '0'));
+    let outStr = `{${hexArray}}`;
+    return outStr;
 }
 
-const pixelsToCByteArray = (data: number[]) => {
-    const bitMap: Record<number, string> = { 0: "00", 1: "01", 2: "10", 3: "11" };
-    let arr = data.map((d) => bitMap[d]);
-    let outStr = `{${binToHex(arr.join(""))}}`;
-    return outStr;
-};
+function convertToGBTileData(pxdata: number[][], tileName: string) {
+    // Ensure pixelData length is exactly 64 (8x8 pixels)
+
+    // Generate the C header file content
+    let headerContent = `// ${tileName}.h\n\n`;
+    headerContent += `#ifndef ${tileName.toUpperCase()}_H\n`;
+    headerContent += `#define ${tileName.toUpperCase()}_H\n\n`;
+    headerContent += `const unsigned char ${tileName}[${pxdata.length}][16] = {\n`;
+
+
+    for (let i = 0; i < pxdata.length; i++) {
+
+        let pixelData: number[] = pxdata[i];
+        // Convert pixelData to 2bpp tile data format
+        const tileData = [];
+        for (let i = 0; i < 16; i++) {
+            let byte1 = 0;
+            let byte2 = 0;
+            for (let j = 0; j < 8; j++) {
+                const pixelIndex = i * 8 + j;
+                const pixelValue = pixelData[pixelIndex] - 1; // Adjust pixel value to 0-3
+
+                byte1 |= ((pixelValue & 1) << (7 - j));
+                byte2 |= (((pixelValue >> 1) & 1) << (7 - j));
+            }
+            tileData.push(byte1, byte2);
+        }
+
+        headerContent += '{';
+        // Add tile data bytes
+        for (let i = 0; i < 16; i++) {
+            headerContent += `    0x${tileData[i].toString(16).padStart(2, '0')},\n`;
+        }
+
+        headerContent += '},';
+
+    }
+
+
+
+    // Close the array and header guard
+    headerContent += `};\n\n#endif // ${tileName.toUpperCase()}_H`;
+
+    return headerContent;
+}
 
 export class GameboyTileDesignerDocument implements vscode.CustomDocument {
     isDirty: boolean = false;
@@ -145,7 +186,7 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
                 vscode.window.showSaveDialog({ saveLabel: 'Export C File', defaultUri: vscode.Uri.from({ scheme: document.uri.scheme, path: newURI }), title: 'Export C File' })
                     .then((uri) => {
                         if (uri) {
-                            let cFile = `const unsigned char ${uri.path.split('/').at(-1)?.split('.').at(0)}[${msg.tiles.length}][16] = {${msg.tiles.map((tx: number[]) => pixelsToCByteArray(tx) + "\n")}};`;
+                            let cFile = convertToGBTileData(msg.tiles, uri.path.split('/').at(-1)?.split('.').at(0) ?? 'data');//= `const unsigned char ${uri.path.split('/').at(-1)?.split('.').at(0)}[${msg.tiles.length}][16] = {${msg.tiles.map((tx: number[]) => pixelsToCByteArray(tx) + "\n")}};`;
                             vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(cFile));
                         }
                     });
@@ -173,10 +214,10 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
 
             vscode.workspace.fs.readFile(vscode.Uri.joinPath(publicLocation, 'index.js')).then((js) => {
                 webviewPanel.webview.html = html.toString()
-                .split('<div id="tile-data" data-tiles=""></div>')
-                .join(`<div id="tile-data" data-tiles="${JSON.stringify(document.tileData)}"></div>`)
-                .split('<script src="index.js"></script>')
-                .join(`<script src="${webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(publicLocation, 'index.min.js'))}"></script>`);
+                    .split('<div id="tile-data" data-tiles=""></div>')
+                    .join(`<div id="tile-data" data-tiles="${JSON.stringify(document.tileData)}"></div>`)
+                    .split('<script src="index.js"></script>')
+                    .join(`<script src="${webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(publicLocation, 'index.min.js'))}"></script>`);
 
             });
         });
