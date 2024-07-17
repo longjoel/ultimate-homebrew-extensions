@@ -7,7 +7,6 @@ import { TileCommands } from './components/tile-commands';
 import { TilesPreview } from './components/tiles-preview';
 
 
-
 // This acquireVsCodeApi is provided by visual studio code and is used to pass messages between the extension html and the extension.
 
 
