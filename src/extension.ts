@@ -10,6 +10,8 @@ import { GameBoyTileDesignerProvider, GameboyTileDesignerDocument } from './game
 
 export function activate(context: vscode.ExtensionContext) {
 
+    
+
     const gbaEmulator = vscode.window.registerCustomEditorProvider(
         'ultimate-homebrew-extensions.gba-emulator', new GBAEmulatorProvider(context), {
         webviewOptions: {
