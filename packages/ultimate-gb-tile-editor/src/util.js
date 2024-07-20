@@ -49,3 +49,4 @@ export function pixelsToCByteArray(name, data) {
     let outStr = `const char *${name} = {${binToHex(arr.join(""))}};`;
     return outStr;
 };
+

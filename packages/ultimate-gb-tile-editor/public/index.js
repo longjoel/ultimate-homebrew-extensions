@@ -4342,16 +4342,16 @@
 	          for (let x = 0; x < 8; x++) {
 	            switch (tileData[y * 8 + x]) {
 	              case 0:
-	                ctx.fillStyle = "white";
+	                ctx.fillStyle = "black";
 	                break;
 	              case 1:
-	                ctx.fillStyle = "lightgray";
-	                break;
-	              case 2:
 	                ctx.fillStyle = "gray";
 	                break;
+	              case 2:
+	                ctx.fillStyle = "lightgray";
+	                break;
 	              case 3:
-	                ctx.fillStyle = "black";
+	                ctx.fillStyle = "white";
 	                break;
 	            }
 	            ctx.fillRect(x * scale + 1, y * scale + 1, scale - 2, scale - 2);
@@ -4384,14 +4384,14 @@
 	  style: {
 	    width: "50%",
 	    height: "100px",
-	    backgroundColor: leftColor === 0 ? "white" : leftColor === 1 ? "lightgray" : leftColor === 2 ? "gray" : "black"
+	    backgroundColor: leftColor === 0 ? "black" : leftColor === 1 ? "gray" : leftColor === 2 ? "lightgray" : "white"
 	  }
 	}, "Left"), React.createElement("button", {
 	  onClick: () => setRightColor((rightColor + 1) % 4),
 	  style: {
 	    width: "50%",
 	    height: "100px",
-	    backgroundColor: rightColor === 0 ? "white" : rightColor === 1 ? "lightgray" : rightColor === 2 ? "gray" : "black"
+	    backgroundColor: rightColor === 0 ? "black" : rightColor === 1 ? "gray" : rightColor === 2 ? "lightgray" : "white"
 	  }
 	}, "Right"));
 
@@ -4593,7 +4593,7 @@
 	                  continue;
 	                }
 	                const color = tile[y * 8 + x];
-	                ctx.fillStyle = color === 0 ? "white" : color === 1 ? "lightgray" : color === 2 ? "gray" : "black";
+	                ctx.fillStyle = color === 0 ? "black" : color === 1 ? "gray" : color === 2 ? "lightgray" : "white";
 	                ctx.fillRect(gridX * scaleWidth + x * pixelWidth, gridY * scaleHeight + y * pixelHeight, pixelWidth, pixelHeight);
 	              }
 	            }

@@ -5,12 +5,12 @@ export const TileColorPicker = ({leftColor, setLeftColor, rightColor, setRightCo
       <button onClick={() => setLeftColor((leftColor + 1) % 4)} style={{
          width: "50%",
          height: "100px",
-         backgroundColor: leftColor === 0 ? "white" : leftColor === 1 ? "lightgray" : leftColor === 2 ? "gray" : "black"
+         backgroundColor: leftColor === 0 ? "black" : leftColor === 1 ? "gray" : leftColor === 2 ? "lightgray" : "white"
       }}>Left</button>
    
       <button onClick={() => setRightColor((rightColor + 1) % 4)} style={{
          width: "50%",
          height: "100px",
-         backgroundColor: rightColor === 0 ? "white" : rightColor === 1 ? "lightgray" : rightColor === 2 ? "gray" : "black"
+         backgroundColor: rightColor === 0 ? "black" : rightColor === 1 ? "gray" : rightColor === 2 ? "lightgray" : "white"
       }}>Right</button>
    </div>;

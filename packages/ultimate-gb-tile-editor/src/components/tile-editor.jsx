@@ -69,16 +69,16 @@ export function TileEditor({
                     for (let x = 0; x < 8; x++) {
                         switch (tileData[y * 8 + x]) {
                             case 0:
-                                ctx.fillStyle = "white";
+                                ctx.fillStyle = "black";
                                 break;
                             case 1:
-                                ctx.fillStyle = "lightgray";
-                                break;
-                            case 2:
                                 ctx.fillStyle = "gray";
                                 break;
+                            case 2:
+                                ctx.fillStyle = "lightgray";
+                                break;
                             case 3:
-                                ctx.fillStyle = "black";
+                                ctx.fillStyle = "white";
                                 break;
                         }
 
