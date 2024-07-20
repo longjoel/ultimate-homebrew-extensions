@@ -48,7 +48,7 @@ export function TilesPreview({
                                     continue;
                                 }
                                 const color = tile[y * 8 + x];
-                                ctx.fillStyle = color === 0 ? "black" : color === 1 ? "gray" : color === 2 ? "lightgray" : "white";
+                                ctx.fillStyle = color === 0 ? "black" : color === 1 ? "white" : color === 2 ? "lightgray" : "gray";
                                 ctx.fillRect((gridX * scaleWidth) + (x * pixelWidth), gridY * scaleHeight + (y * pixelHeight), pixelWidth, pixelHeight);
                             }
                         }

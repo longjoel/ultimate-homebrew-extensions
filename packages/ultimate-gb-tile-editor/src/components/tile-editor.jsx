@@ -72,13 +72,13 @@ export function TileEditor({
                                 ctx.fillStyle = "black";
                                 break;
                             case 1:
-                                ctx.fillStyle = "gray";
+                                ctx.fillStyle = "white";
                                 break;
                             case 2:
                                 ctx.fillStyle = "lightgray";
                                 break;
                             case 3:
-                                ctx.fillStyle = "white";
+                                ctx.fillStyle = "gray";
                                 break;
                         }
 

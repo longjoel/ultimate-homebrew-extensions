@@ -4345,13 +4345,13 @@
 	                ctx.fillStyle = "black";
 	                break;
 	              case 1:
-	                ctx.fillStyle = "gray";
+	                ctx.fillStyle = "white";
 	                break;
 	              case 2:
 	                ctx.fillStyle = "lightgray";
 	                break;
 	              case 3:
-	                ctx.fillStyle = "white";
+	                ctx.fillStyle = "gray";
 	                break;
 	            }
 	            ctx.fillRect(x * scale + 1, y * scale + 1, scale - 2, scale - 2);
@@ -4384,14 +4384,14 @@
 	  style: {
 	    width: "50%",
 	    height: "100px",
-	    backgroundColor: leftColor === 0 ? "black" : leftColor === 1 ? "gray" : leftColor === 2 ? "lightgray" : "white"
+	    backgroundColor: leftColor === 0 ? "black" : leftColor === 1 ? "white" : leftColor === 2 ? "lightgray" : "gray"
 	  }
 	}, "Left"), React.createElement("button", {
 	  onClick: () => setRightColor((rightColor + 1) % 4),
 	  style: {
 	    width: "50%",
 	    height: "100px",
-	    backgroundColor: rightColor === 0 ? "black" : rightColor === 1 ? "gray" : rightColor === 2 ? "lightgray" : "white"
+	    backgroundColor: rightColor === 0 ? "black" : rightColor === 1 ? "white" : rightColor === 2 ? "lightgray" : "gray"
 	  }
 	}, "Right"));
 
@@ -4593,7 +4593,7 @@
 	                  continue;
 	                }
 	                const color = tile[y * 8 + x];
-	                ctx.fillStyle = color === 0 ? "black" : color === 1 ? "gray" : color === 2 ? "lightgray" : "white";
+	                ctx.fillStyle = color === 0 ? "black" : color === 1 ? "white" : color === 2 ? "lightgray" : "gray";
 	                ctx.fillRect(gridX * scaleWidth + x * pixelWidth, gridY * scaleHeight + y * pixelHeight, pixelWidth, pixelHeight);
 	              }
 	            }
