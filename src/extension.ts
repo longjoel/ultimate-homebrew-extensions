@@ -4,6 +4,7 @@ import { NESEmulatorProvider } from './NESEmulatorProvider';
 import { SNESEmulatorProvider } from './SNESEmulatorProvider';
 
 import { GameBoyTileDesignerProvider, GameboyTileDesignerDocument } from './gameboy-tile-designer';
+import { GameBoyMapDesignerProvider, GameboyMapDesignerDocument } from './gameboy-map-designer';
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 
@@ -37,6 +38,18 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
     context.subscriptions.push(snesEmulator);
+
+    //ultimate-homebrew-extensions.gb-map-editor
+
+    const gameboyMapDesigner = vscode.window.registerCustomEditorProvider('ultimate-homebrew-extensions.gb-map-editor', new GameBoyMapDesignerProvider(context), {
+        webviewOptions: {
+            retainContextWhenHidden: true,
+            enableFindWidget: false
+        },
+        supportsMultipleEditorsPerDocument: false,
+
+    });
+    context.subscriptions.push(gameboyMapDesigner);
 
     const gameboyTileDesigner = vscode.window.registerCustomEditorProvider('ultimate-homebrew-extensions.gb-tile-editor', new GameBoyTileDesignerProvider(context), {
         webviewOptions: {

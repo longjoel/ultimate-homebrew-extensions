@@ -29,7 +29,16 @@
         "displayName": "GB Tile Editor",
         "selector": [
           {
-            "filenamePattern": "*.{gbtd}"
+            "filenamePattern": "*.gbtd"
+          }
+        ]
+      },
+      {
+        "viewType": "ultimate-homebrew-extensions.gb-map-editor",
+        "displayName": "GB Map Editor",
+        "selector": [
+          {
+            "filenamePattern": "*.gbtm"
           }
         ]
       },
@@ -65,6 +74,7 @@
   "scripts": {
     "vscode:prepublish": "npm run package",
     "build-tile-editor": "cd packages/gb-tile-editor && npm run build",
+    "build-map-editor": "cd packages/gb-tile-editor && npm run build",
     "compile": "webpack",
     "watch": "webpack --watch",
     "package": "webpack --mode production --devtool hidden-source-map",
@@ -75,11 +85,12 @@
     "test": "vscode-test"
   },
   "devDependencies": {
+    "@types/json-schema": "^7.0.15",
     "@types/mocha": "^10.0.6",
     "@types/node": "20.x",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "@types/vscode": "^1.90.0",
+    "@types/vscode": "^1.91.0",
     "@typescript-eslint/eslint-plugin": "^7.11.0",
     "@typescript-eslint/parser": "^7.11.0",
     "@vscode/test-cli": "^0.0.9",
