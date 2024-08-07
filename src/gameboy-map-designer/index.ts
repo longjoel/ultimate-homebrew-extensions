@@ -29,23 +29,23 @@ export class GameBoyMapDesignerProvider implements vscode.CustomEditorProvider<G
 
         var px = new Promise<GameboyMapDesignerDocument>((resolve, reject) => {
 
-            // vscode.workspace.fs.readFile(uri).then((data) => {
-            //     let tileData: number[][] = [] as number[][];
-            //     const text = new TextDecoder().decode(data);
-            //     const lines = text.split('\n');
-            //     for (let i = 0; i < lines.length; i++) {
-            //         const line = lines[i];
-            //         const parts = line.split(',');
-            //         tileData.push(parts.map((x) => parseInt(x)));
-            //     }
-            //     if (tileData.length === 0) {
-            //         tileData = new Array(256).fill(new Array(64).fill(0)) as number[][];
-            //     }
+            vscode.workspace.fs.readFile(uri).then((data) => {
+                let tileData: number[][] = [] as number[][];
+                const text = new TextDecoder().decode(data);
+                const lines = text.split('\n');
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    const parts = line.split(',');
+                    tileData.push(parts.map((x) => parseInt(x)));
+                }
+                if (tileData.length === 0) {
+                    tileData = new Array(256).fill(new Array(64).fill(0)) as number[][];
+                }
 
-            //     var gbtd = new GameboyTileDesignerDocument(uri, tileData);
-            //     console.log("open custom document", gbtd.uniqueId, crc32(JSON.stringify(gbtd.tileData)));
-            //     resolve(gbtd);
-            // });
+                var gbtm = new GameboyMapDesignerDocument(uri);
+               // console.log("open custom document", gbtd.uniqueId, crc32(JSON.stringify(gbtd.tileData)));
+                resolve(gbtm);
+            });
 
 
         });
@@ -93,7 +93,7 @@ export class GameBoyMapDesignerProvider implements vscode.CustomEditorProvider<G
       //  console.log("Resolve Custom Editor", document.uniqueId, crc32(JSON.stringify(document.tileData)));
 
         webviewPanel.webview.options = {
-            enableScripts: true, localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'packages', 'ultimate-gb-tile-editor', 'public')]
+            enableScripts: true, localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'packages', 'ultimate-gb-map-editor', 'public')]
         };
 
         this._webViewPanel = webviewPanel;
@@ -131,8 +131,8 @@ export class GameBoyMapDesignerProvider implements vscode.CustomEditorProvider<G
 
             vscode.workspace.fs.readFile(vscode.Uri.joinPath(publicLocation, 'index.js')).then((js) => {
                 webviewPanel.webview.html = html.toString()
-                    .split('<div id="tile-data" data-tiles=""></div>')
-                    .join(`<div id="tile-data" data-tiles="${JSON.stringify('{}')}"></div>`)
+                    .split('<div id="map-data" data-map=""></div>')
+                    .join(`<div id="map-data" data-map="${JSON.stringify('{}')}"></div>`)
                     .split('<script src="index.js"></script>')
                     .join(`<script src="${webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(publicLocation, 'index.min.js'))}"></script>`);
 

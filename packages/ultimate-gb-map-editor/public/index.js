@@ -4281,10 +4281,8 @@
 	};
 	let data = document.querySelector('#map-data').getAttribute('data-map');
 	if (!data) {
-	  data = new Array(256).fill(new Array(64).fill(0));
+	  data = new Array(256).fill(0);
 	}
-	client.createRoot(document.querySelector('#app')).render( React.createElement(App, {
-	  initialData: JSON.parse(data)
-	}));
+	client.createRoot(document.querySelector('#app')).render( React.createElement(App, null));
 
 })();
