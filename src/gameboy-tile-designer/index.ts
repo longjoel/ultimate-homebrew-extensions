@@ -45,7 +45,11 @@ function convertToGBTileData(pxdata: number[][], tileName: string) {
 
     for (let i = 0; i < pxdata.length; i++) {
 
+        if(!pxdata[i] || pxdata[i].length !== 64) {
+            pxdata[i] = new Array(64).fill(0);      
+        }
         let pixelData: number[] = pxdata[i];
+
         // Convert pixelData to 2bpp tile data format
         const tileData = [];
         for (let i = 0; i < 16; i++) {
@@ -182,8 +186,8 @@ export class GameBoyTileDesignerProvider implements vscode.CustomEditorProvider<
         this._webViewPanel = webviewPanel;
         webviewPanel.webview.onDidReceiveMessage((msg) => {
             if (msg.command === 'export_tiles') {
-                var newURI = document.uri.path.replace('.gbtd', '.c');
-                vscode.window.showSaveDialog({ saveLabel: 'Export C File', defaultUri: vscode.Uri.from({ scheme: document.uri.scheme, path: newURI }), title: 'Export C File' })
+                var newURI = document.uri.path.replace('.gbtd', '.h');
+                vscode.window.showSaveDialog({ saveLabel: 'Export header file', defaultUri: vscode.Uri.from({ scheme: document.uri.scheme, path: newURI }), title: 'Export header file' })
                     .then((uri) => {
                         if (uri) {
                             let cFile = convertToGBTileData(msg.tiles, uri.path.split('/').at(-1)?.split('.').at(0) ?? 'data');//= `const unsigned char ${uri.path.split('/').at(-1)?.split('.').at(0)}[${msg.tiles.length}][16] = {${msg.tiles.map((tx: number[]) => pixelsToCByteArray(tx) + "\n")}};`;
